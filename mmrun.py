@@ -9,6 +9,8 @@ import mm.viz
 import logging
 import yaml
 import yaml.composer
+import shutil
+import os
 
 
 
@@ -58,7 +60,13 @@ def Run_visualization(configs):
     else:
         logging.info('Skipping viz generator')
 
+def Run_init():
+    if os.path.isdir("/tmp"):
+        shutil.rmtree("/tmp")
+    os.makedirs("/tmp")
+    
 def Run(configs):
+    Run_init()
     Run_input_handler(configs)    
     Run_slicing_handler(configs)
     Run_clustering_handler(configs)
