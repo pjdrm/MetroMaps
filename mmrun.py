@@ -1,18 +1,20 @@
 #! /usr/bin/env python2.7
 
 import argparse
-import mm.inputhelpers
 import mm.inputhelpers.factory
 import mm.input
 import mm.mapgen
 import mm.viz
 import logging
-import yaml
 import yaml.composer
-import shutil
 import os
 
-
+def rmDir(top):
+    for root, dirs, files in os.walk(top, topdown=False):
+        for name in files:
+            os.remove(os.path.join(root, name))
+        for name in dirs:
+            os.rmdir(os.path.join(root, name))
 
 def Run_input_handler(configs):
     input_helper_configs = configs.get('input_helper')
@@ -62,8 +64,9 @@ def Run_visualization(configs):
 
 def Run_init():
     if os.path.isdir("/tmp"):
-        shutil.rmtree("/tmp")
-    os.makedirs("/tmp")
+        rmDir("/tmp")
+    else:
+        os.makedirs("/tmp")
     
 def Run(configs):
     Run_init()
