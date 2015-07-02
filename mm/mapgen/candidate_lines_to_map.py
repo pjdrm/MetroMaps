@@ -241,8 +241,8 @@ def main(infilename, outfile, outfile_json=None):
     .3+.15*numberLinesChosen so far.'''
     candidatelines.getCrossingLines(3, .3, .15) 
 
-    # with open(outfile, 'w') as fo:
-    #     fo.write(candidatelines.serializeChosenLines())
+    with open(outfile, 'w') as fo:
+        fo.write(candidatelines.serializeChosenLines())
     if outfile_json:
         with open(outfile_json, 'w') as fo:
             logging.debug('Dumping to JSON file')

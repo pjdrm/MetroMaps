@@ -1,0 +1,65 @@
+global: &GLOBALS
+    log_level: 'debug'
+    doc_metadata: domains/avl/data/doc_meta.json
+    mm_standard_input: /tmp/mm_input.json
+
+input_generator:
+    <<: *GLOBALS
+    mode: on
+    type: segmented_docments
+    n: 100
+    steming: on
+    domain: domains/avl
+    input_directory: docsSeg
+
+input_helper:
+    <<: *GLOBALS
+    mode: on
+    encoding: UTF-8
+    in_encoding: cp1252
+    discard_frequency: 1
+    name: whitelistcounter
+    whitelist: domains/avl/data/whitelist.txt
+    input_directory: domains/avl/data/rawtext
+
+slicing:
+    <<: *GLOBALS
+    mode: on
+    output_dir: /tmp/query_result
+    choose_representative_token: on
+    num_timeslices: 2
+    output_json: &score_JSON /tmp/legacy_handler_out.json
+
+clustering:
+    <<: *GLOBALS
+    mode: on
+    min_freq_in_doc: 0
+    tfidf_accept: 0
+    max_tokens_per_doc: 50
+    similarity_merge: .95 # <intersection> / <small size> above this limit merges
+    dilution_merge: .1
+    graphing: off
+    out_legacy_dir: /tmp/clusters/clusters
+    out_graph_dir: /tmp/timeslice_graphs/
+    input_json: *score_JSON 
+    output_json: /tmp/clusters.json
+
+mapgen:
+    <<: *GLOBALS
+    mode: on
+    cluster_dir: /tmp/clusters
+    raw_lines: /tmp/raw_lines
+    line_descriptions: /tmp/line_descriptions
+    chosen_lines: domains/avl/out/final/avl.mm
+    chosen_lines_json: domains/avl/out/final/avl.json
+    chosen_docs_for_map: final_map.mm
+
+vizbuilder:
+    <<: *GLOBALS
+    mode: on
+    name: clusterdescription
+    input_lines_json: domains/avl/out/final/avl.json
+    final_map_viz_json: domains/avl/out/final/avl_viz.json
+    producehtml: on
+    website_output_dir: domains/avl/out
+    webpage_name: AVL.html

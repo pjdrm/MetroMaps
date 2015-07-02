@@ -8,6 +8,7 @@ import mm.viz
 import logging
 import yaml.composer
 import os
+from mm.input.generator.SegDocumentsGenerator import SegDocumentsGenerator
 
 def rmDir(top):
     for root, dirs, files in os.walk(top, topdown=False):
@@ -16,6 +17,22 @@ def rmDir(top):
         for name in dirs:
             os.rmdir(os.path.join(root, name))
 
+def Run_init():
+    if os.path.isdir("/tmp"):
+        rmDir("/tmp")
+    else:
+        os.makedirs("/tmp")
+
+def Run_input_generator(configs):
+    input_generator_configs = configs.get('input_generator')
+    if (input_generator_configs.get('mode')):
+        logging.debug(input_generator_configs)
+        logging.info("Running input generator handler")
+        ig_handler = SegDocumentsGenerator(input_generator_configs)
+        ig_handler.run()
+    else:
+        logging.info("Skipping input generator")
+    
 def Run_input_handler(configs):
     input_helper_configs = configs.get('input_helper')
     if (input_helper_configs.get('mode')):
@@ -61,15 +78,10 @@ def Run_visualization(configs):
         viz_handler.run()
     else:
         logging.info('Skipping viz generator')
-
-def Run_init():
-    if os.path.isdir("/tmp"):
-        rmDir("/tmp")
-    else:
-        os.makedirs("/tmp")
     
 def Run(configs):
     Run_init()
+    Run_input_generator(configs)
     Run_input_handler(configs)    
     Run_slicing_handler(configs)
     Run_clustering_handler(configs)
@@ -91,9 +103,10 @@ def main(config_file, defaults="mm/default.yaml"):
     with open(config_file) as cf:
         try: 
             new_config = yaml.load(cf)
-            for section in sections:
-                sec_dict = new_config.get(section, {})
-                config_dict.get(section).update(sec_dict)
+            config_dict = new_config
+            #for section in sections:
+            #    sec_dict = new_config.get(section, {})
+            #    config_dict.get(section).update(sec_dict)
         except yaml.composer.ComposerError:
             logging.error('ERROR in reading the input config file')
             raise
