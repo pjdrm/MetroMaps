@@ -6,7 +6,7 @@ global: &GLOBALS
 input_generator:
     <<: *GLOBALS
     mode: on
-    type: segmented_docments
+    type: SegDocumentsGenerator
     n: 100
     steming: on
     domain: domains/avl

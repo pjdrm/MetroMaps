@@ -7,6 +7,7 @@ import json
 import sys
 import os
 import os.path
+import networkx as nx
 import snap
 from itertools import combinations
 
@@ -59,7 +60,7 @@ class ClusterGenerator(object):
             pylab.close()
             del fig
         else:
-            raise Error("Configuration does not allow graphing")
+            raise Exception("Configuration does not allow graphing")
 
     
 

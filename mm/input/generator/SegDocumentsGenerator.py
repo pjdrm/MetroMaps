@@ -71,5 +71,8 @@ class SegDocumentsGenerator(object):
             json.dump(dicts, outfile)
             
         self.mkwhitelist(self.domain + "/data/rawtext/", self.domain + '/data/whitelist.txt', self.n)            
-        print "Done generating the " + self.domain + " domain"  
+        print "Done generating the " + self.domain + " domain"
+        
+def construct(config):
+    return SegDocumentsGenerator(config)  
         

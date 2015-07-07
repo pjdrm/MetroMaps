@@ -8,7 +8,7 @@ import mm.viz
 import logging
 import yaml.composer
 import os
-from mm.input.generator.SegDocumentsGenerator import SegDocumentsGenerator
+import mm.input.generator.factory
 
 def rmDir(top):
     for root, dirs, files in os.walk(top, topdown=False):
@@ -28,7 +28,7 @@ def Run_input_generator(configs):
     if (input_generator_configs.get('mode')):
         logging.debug(input_generator_configs)
         logging.info("Running input generator handler")
-        ig_handler = SegDocumentsGenerator(input_generator_configs)
+        ig_handler = mm.input.generator.factory.Generate(input_generator_configs)
         ig_handler.run()
     else:
         logging.info("Skipping input generator")
