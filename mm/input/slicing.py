@@ -36,7 +36,6 @@ class SlicingHandler:
         self.max_token_counts, self.num_docs_with_term = token_stats(self.doc_counts)
 
         self.num_docs = len(self.doc_counts)
-        self.choose_representative_token = legacy_helper_config_dict.get('choose_representative_token', False)
 
     def tfidf(self, token_id, doc_id):
         if self.num_docs_with_term.get(token_id, 1) <= 1:
@@ -148,11 +147,10 @@ class SlicingHandler:
                     token_id = token
 
                     token_dict = {'id':token_id,'tfidf':token_score,'token_doc_count':count}
-                    tokens.append(token_dict)
-                    if self.choose_representative_token: 
-                        token_syns = self.repr_tokens[token_id]
-                        best_syn = max(token_syns, key=lambda x: token_syns[x])
-                        token_dict['plaintext'] = best_syn
+                    tokens.append(token_dict) 
+                    token_syns = self.repr_tokens[token_id]
+                    best_syn = max(token_syns, key=lambda x: token_syns[x])
+                    token_dict['plaintext'] = best_syn
 
                 doc_entry['tokens'] = tokens
                 document_json_data.append(doc_entry)
