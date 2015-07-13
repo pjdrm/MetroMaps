@@ -6,15 +6,15 @@ Created on 02/07/2015
 import string
 import os
 import utils.nlp.tokenizer as tokenizer
+import utils.nlp.stopwords as stopwords
 
 from sklearn.feature_extraction.text import TfidfVectorizer
-from utils.nlp.tokenizer import stem_flag
 
 '''
 Keywords are obtained based of tfidf score.
 The topN words from each document are returned
 '''
-def getkeywords(path, n):
+def getkeywords(path, n, customSWFile):
     token_dict = {}
     for subdir, dirs, files in os.walk(path):
         for file in files:
@@ -25,8 +25,9 @@ def getkeywords(path, n):
             #text = shakes.read()
             text = filter(lambda x: x in string.printable, text)
             lowers = text.encode('utf-8').lower()
-            no_punctuation = lowers.encode('utf-8').translate(None, string.punctuation)
-            token_dict[file] = no_punctuation
+            no_punctuation = lowers.encode('utf-8').translate(None, string.punctuation+'0123456789')
+            no_punctuation_sw = stopwords.removeStopWords(no_punctuation, customSWFile)
+            token_dict[file] = no_punctuation_sw
             
     #this can take some time
     tf = TfidfVectorizer(tokenizer=tokenizer.tokenize, stop_words='english')
@@ -39,6 +40,6 @@ def getkeywords(path, n):
         doc_scores = [pair for pair in zip(range(0, len(doc)), doc) if pair[1] > 0]
         sorted_doc_scores = sorted(doc_scores, key=lambda t: t[1] * -1)
         for word, score in [(feature_names[word_id], score) for (word_id, score) in sorted_doc_scores][:n]:
-            #print('{0: <20} {1}'.format(word, score))
+            print('{0: <20} {1}'.format(word, score))
             keywords.append(word)
     return set(keywords)

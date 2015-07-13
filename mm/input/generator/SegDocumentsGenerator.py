@@ -27,12 +27,13 @@ class SegDocumentsGenerator(object):
         self.domain  = input_gen_config_dic['domain']
         self.n  = input_gen_config_dic['n']
         self.steming = input_gen_config_dic['steming']
+        self.customSWFile = input_gen_config_dic['custom_stop_words']
         
     '''
     Generated the list of words that can appear on a metro station (whitelist)
     '''
-    def mkwhitelist(self, docsPath, outPath, n):
-        keywords = tfidf.getkeywords(docsPath, n)
+    def mkwhitelist(self, docsPath, outPath):
+        keywords = tfidf.getkeywords(docsPath, self.n, self.customSWFile)
         with open(outPath, 'w') as file:
             for keyword in keywords:
                 file.write("{}\n".format(keyword))
@@ -70,7 +71,7 @@ class SegDocumentsGenerator(object):
         with open(self.domain + '/data/doc_meta.json', 'w') as outfile:
             json.dump(dicts, outfile)
             
-        self.mkwhitelist(self.domain + "/data/rawtext/", self.domain + '/data/whitelist.txt', self.n)            
+        self.mkwhitelist(self.domain + "/data/rawtext/", self.domain + '/data/whitelist.txt')            
         print "Done generating the " + self.domain + " domain"
         
 def construct(config):

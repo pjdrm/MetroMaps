@@ -8,9 +8,10 @@ input_generator:
     mode: on
     type: SegDocumentsGenerator
     n: 100
-    steming: off
+    steming: on
+    custom_stop_words: resources/custom_stop_words.txt
     domain: domains/avl
-    input_directory: docsSeg
+    input_directory: resources/docsSeg
 
 input_helper:
     <<: *GLOBALS
