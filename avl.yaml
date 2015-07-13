@@ -8,7 +8,7 @@ input_generator:
     mode: on
     type: SegDocumentsGenerator
     n: 100
-    steming: on
+    steming: off
     domain: domains/avl
     input_directory: docsSeg
 
@@ -26,7 +26,7 @@ slicing:
     <<: *GLOBALS
     mode: on
     output_dir: /tmp/query_result
-    num_timeslices: 8
+    num_timeslices: 7
     output_json: &score_JSON /tmp/legacy_handler_out.json
 
 clustering:

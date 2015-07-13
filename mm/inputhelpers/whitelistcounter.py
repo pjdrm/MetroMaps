@@ -46,12 +46,9 @@ class WhiteListCounter():
             self.synonyms[word_id] = synonym_counts
             
             
-
-
-
     def run_filename(self, filename):
         with open(filename) as fi:
-            doc_id = self._get_doc_id(filename)
+            doc_id = os.path.basename(filename).split('.')[0]
             for line in fi:
                 line = line.strip()
                 for dirty_word in line.split():
@@ -73,7 +70,7 @@ class WhiteListCounter():
 
 
         return {v: k for k,v in self.token_to_id.items()}
-    
+
     def save(self):
         
         
@@ -111,15 +108,6 @@ class WhiteListCounter():
             self.token_to_id[token] = token_id
             self._next_token_id += 1
         return token_id
-
-    
-
-    def _get_doc_id(self, doc, fail_on_none=False):
-        doc_id = self.docname_to_id.get(doc)
-        if not doc_id:
-            doc_id = self._next_doc_id
-            self._next_doc_id += 1
-        return doc_id
 
     '''
     def run(self):

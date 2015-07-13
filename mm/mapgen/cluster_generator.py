@@ -213,6 +213,7 @@ class ClusterGenerator(object):
                 #     cluster_d = {'cluster_tokens': cluster_k, 'k': k+2}
                 #     clusters += [cluster_d]
             self.timeslice_clusters[i] = self._merge_clusters(clusters)
+            print self.timeslice_clusters[i]
                 # for community in nx.k_clique_communities(g,k+2):
                 #     cluster_k = []
                 #     for node in community:
