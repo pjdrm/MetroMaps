@@ -2,16 +2,26 @@ global: &GLOBALS
     log_level: 'debug'
     doc_metadata: domains/avl/data/doc_meta.json
     mm_standard_input: /tmp/mm_input.json
+    domain: domains/avl
 
 input_generator:
     <<: *GLOBALS
     mode: on
     type: SegDocumentsGenerator
-    n: 100
-    steming: on
-    custom_stop_words: resources/custom_stop_words.txt
-    domain: domains/avl
     input_directory: resources/docsSeg
+    
+input_preprocessing:
+    <<: *GLOBALS
+    mode: on
+    gen_whitelist: on
+    n: 100
+    lower_case: on
+    remove_punctuation: on
+    steming: on
+    remove_stopwords: on
+    custom_stop_words: resources/custom_stop_words.txt
+    expand_contractions: on
+    contractions_dic_file: resources/contractions.txt
 
 input_helper:
     <<: *GLOBALS

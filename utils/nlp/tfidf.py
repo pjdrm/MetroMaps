@@ -6,7 +6,6 @@ Created on 02/07/2015
 import string
 import os
 import utils.nlp.tokenizer as tokenizer
-import utils.nlp.stopwords as stopwords
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 
@@ -22,12 +21,7 @@ def getkeywords(path, n, customSWFile):
             #shakes = codecs.open(file_path, 'r', encoding='utf-8')
             with open (file_path, "r") as docFile:
                     text = docFile.read()
-            #text = shakes.read()
-            text = filter(lambda x: x in string.printable, text)
-            lowers = text.encode('utf-8').lower()
-            no_punctuation = lowers.encode('utf-8').translate(None, string.punctuation+'0123456789')
-            no_punctuation_sw = stopwords.removeStopWords(no_punctuation, customSWFile)
-            token_dict[file] = no_punctuation_sw
+            token_dict[file] = text
             
     #this can take some time
     tf = TfidfVectorizer(tokenizer=tokenizer.tokenize, stop_words='english')
@@ -40,6 +34,6 @@ def getkeywords(path, n, customSWFile):
         doc_scores = [pair for pair in zip(range(0, len(doc)), doc) if pair[1] > 0]
         sorted_doc_scores = sorted(doc_scores, key=lambda t: t[1] * -1)
         for word, score in [(feature_names[word_id], score) for (word_id, score) in sorted_doc_scores][:n]:
-            print('{0: <20} {1}'.format(word, score))
+            #print('{0: <20} {1}'.format(word, score))
             keywords.append(word)
     return set(keywords)

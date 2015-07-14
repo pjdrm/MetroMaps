@@ -2,6 +2,7 @@
 
 import argparse
 import mm.inputhelpers.factory
+import mm.inputhelpers.preprocessing
 import mm.input
 import mm.mapgen
 import mm.viz
@@ -32,6 +33,17 @@ def Run_input_generator(configs):
         ig_handler.run()
     else:
         logging.info("Skipping input generator")
+        
+def Run_input_preprocessing(configs):
+    input_preprocessing_configs = configs.get('input_preprocessing')
+    if (input_preprocessing_configs.get('mode')):
+        logging.debug(input_preprocessing_configs)
+        logging.info("Running input preprocessing")
+        handler_preprocessing = mm.inputhelpers.preprocessing.TextPreprocessing(input_preprocessing_configs)
+        handler_preprocessing.run()
+    else:
+        logging.info("Skipping preprocessing")
+        
     
 def Run_input_handler(configs):
     input_helper_configs = configs.get('input_helper')
@@ -82,6 +94,7 @@ def Run_visualization(configs):
 def Run(configs):
     Run_init()
     Run_input_generator(configs)
+    Run_input_preprocessing(configs)
     Run_input_handler(configs)    
     Run_slicing_handler(configs)
     Run_clustering_handler(configs)
