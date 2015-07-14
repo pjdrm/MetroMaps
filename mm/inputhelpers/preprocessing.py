@@ -3,6 +3,8 @@ Created on 14/07/2015
 
 @author: Mota
 '''
+import json
+import re
 import string
 import glob
 import utils.nlp.tokenizer as tokenizer
@@ -29,6 +31,10 @@ class TextPreprocessing(object):
         self.raw_text = self.domain + "/data/rawtext/"
         self.white_list = self.domain + '/data/whitelist.txt'
         
+        if(self.input_preprocessing_configs['expand_contractions']):
+            with open(input_preprocessing_configs['contractions_dic_file']) as contractions_dic_file:
+                self.contractions_dic =  json.load(contractions_dic_file)
+        
     def stem_input(self, docStr):
         stemDoc = tokenizer.tokenize(docStr)
         return " ".join(stemDoc)
@@ -38,10 +44,17 @@ class TextPreprocessing(object):
         return no_sw_doc
     
     def remove_punctuation(self, docStr):
-        return docStr.translate(None, string.punctuation+'0123456789')
+        return docStr.encode('utf-8').translate(None, string.punctuation+'0123456789')
     
     def lower_case(self, docStr):
         return docStr.lower()
+    
+    def expand(self, docStr):
+        contractions_re = re.compile('(%s)' % '|'.join(self.contractions_dic.keys()))
+        def replace(match):
+            return self.contractions_dic[match.group(0)]
+        
+        return contractions_re.sub(replace, docStr)
                 
     '''
     Generated the list of words that can appear on a metro station (whitelist)
@@ -58,6 +71,9 @@ class TextPreprocessing(object):
                 docStr = docFile.read()
                 docStr = filter(lambda x: x in string.printable, docStr)
                 
+                if(self.input_preprocessing_configs['expand_contractions']):
+                    docStr = self.expand(docStr)
+            
                 if(self.input_preprocessing_configs['lower_case']):
                     docStr = self.lower_case(docStr)
                     
