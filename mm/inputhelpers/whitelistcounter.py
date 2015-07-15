@@ -58,7 +58,6 @@ class WhiteListCounter():
                         word_id = self._get_token_id(word)
                         self._count_word(word_id, doc_id, dirty_word)
     def run(self):
-
         filenames = os.listdir(self.input_directory)
         logging.debug('Processing %i files' % (len(filenames)))
         for filename in filenames:

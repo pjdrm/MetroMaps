@@ -10,23 +10,24 @@ import os.path
 import networkx as nx
 import snap
 from itertools import combinations
+import metro_station_generator
 
-
-class ClusterGenerator(object):
+'''
+Generates Cluster (aka metro stations) based on the Clique Percolation graph technique
+'''
+class ClusterGeneratorCP(metro_station_generator.MetroStationGenerator):
     def __init__(self, config):
+        super(ClusterGeneratorCP, self).__init__(config)
         self.input_JSON = config['input_json']
-        self.output_JSON = config['output_json']
         self.graphing_on = config.get('graphing', False)
         self.graphing_out = config.get('out_graph_dir')
         self.similarity_merge = float(config.get('similarity_merge'))
         self.dilution_merge = float(config.get('dilution_merge'))
-        self.out_legacy_dir = config.get('out_legacy_dir')
         self.tfidf_accept = float(config.get('tfidf_accept'))
         self.max_tokens_per_doc = int(config.get('max_tokens_per_doc'))
         self.min_freq_in_doc = int(config.get('min_freq_in_doc'))
-        if not os.path.exists(self.out_legacy_dir):
-            logging.info('Created directory %s' % self.out_legacy_dir)
-            os.makedirs(self.out_legacy_dir)
+        
+        
         with open(self.input_JSON) as f_in:
             self.timeslices = json.load(f_in)
             logging.debug(str(self))
@@ -115,7 +116,7 @@ class ClusterGenerator(object):
         return self.__repr__()
 
     def __repr__(self):
-        return "ClusterGenerator: %s timeslices" % len(self.timeslices)
+        return "ClusterGeneratorCP: %s timeslices" % len(self.timeslices)
 
     @staticmethod
     def _merge_one_cluster(from_cluster, into_cluster):
@@ -142,12 +143,12 @@ class ClusterGenerator(object):
                     continue
                 potential_parent = set(potential_parent_item.get('cluster_tokens'))
                 similarity_score = (len(current_cluster & potential_parent)/float(len(current_cluster)))
-                potential_merge = ClusterGenerator._merge_one_cluster(current_cluster, potential_parent)
+                potential_merge = ClusterGeneratorCP._merge_one_cluster(current_cluster, potential_parent)
                 dilution_score = (len(potential_merge - current_cluster) / float(len(current_cluster)))
                 if similarity_score >= self.similarity_merge and dilution_score <= self.dilution_merge:
                     logging.debug('Merging {{{%s}}} into {{{%s}}} (%f similarity) (%f dilution)' \
                             % (str(current_cluster), str(potential_parent), similarity_score, dilution_score) )
-                    clusters[j]['cluster_tokens'] = list(ClusterGenerator._merge_one_cluster(current_cluster, potential_parent))
+                    clusters[j]['cluster_tokens'] = list(ClusterGeneratorCP._merge_one_cluster(current_cluster, potential_parent))
                     clusters[i] = None
                     break
         return [cluster for cluster in clusters if cluster]
@@ -213,7 +214,6 @@ class ClusterGenerator(object):
                 #     cluster_d = {'cluster_tokens': cluster_k, 'k': k+2}
                 #     clusters += [cluster_d]
             self.timeslice_clusters[i] = self._merge_clusters(clusters)
-            print self.timeslice_clusters[i]
                 # for community in nx.k_clique_communities(g,k+2):
                 #     cluster_k = []
                 #     for node in community:
@@ -227,30 +227,5 @@ class ClusterGenerator(object):
             #self.timeslice_clusters[i] = self._merge_clusters(clusters)    
         logging.debug('Clusters for all timeslices')
 
-
-    def write(self):
-        if not self.timeslice_clusters:
-            logging.error('Run has not been run yet or there are no timeslices available')
-        else:
-            with open(self.output_JSON, 'w') as outjson:
-                json.dump(self.timeslice_clusters, outjson)
-
-            if self.out_legacy_dir: 
-                for i in range(len(self.timeslices)):
-                    timeslice_start_date = self.timeslices[i]['cluster_start_date']
-                    timeslice_end_date = self.timeslices[i]['cluster_end_date']
-                    filename = 'clusters_%s_%s' % (timeslice_start_date, timeslice_end_date)
-                    with open(os.path.join(self.out_legacy_dir, filename), 'w') as legacy_out_cluster:
-                        for cluster in self.timeslice_clusters[i]:
-                            tokens = cluster['cluster_tokens']
-                            tokens_joined = ', '.join(tokens)
-                            num_tokens = len(tokens)
-                            text = 'Cluster: %i %s\n' % (num_tokens, tokens_joined)
-                            legacy_out_cluster.write(text.encode('utf-8'))
-
-
-
-
-
-        logging.info('Clusters written to %s' % self.output_JSON)
-        logging.info('Legacy clusters written to %s' % self.out_legacy_dir)
+def construct(config):
+    return ClusterGeneratorCP(config)  

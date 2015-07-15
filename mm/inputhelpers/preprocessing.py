@@ -67,7 +67,8 @@ class TextPreprocessing(object):
         
     def run(self):
         for doc in glob.glob(self.raw_text + "/*"):
-            with open (doc, "r+") as docFile:
+            doc_name = doc.split('\\')[-1]
+            with open (doc, "r+") as docFile, open(self.input_preprocessing_configs['domain'] + '/data/swtext/' + doc_name, "w") as docWithSW:
                 docStr = docFile.read()
                 docStr = filter(lambda x: x in string.printable, docStr)
                 
@@ -84,6 +85,12 @@ class TextPreprocessing(object):
                     tokenizer.stemTokens()
                     docStr = self.stem_input(docStr)
         
+                '''
+                Major Hack: generating metro stations with RAKE requires the text with stop words,
+                since the multi-word candidate generation is based on them.
+                '''
+                docWithSW.write(docStr)
+                
                 if(self.input_preprocessing_configs['remove_stopwords']):
                     docStr = self.remove_stop_words(docStr)
                     

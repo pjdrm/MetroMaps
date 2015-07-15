@@ -1,2 +1,2 @@
-from .cluster_generator import ClusterGenerator
+from mm.mapgen.cluster_generator_cp import ClusterGeneratorCP
 from .legacy_generator import LegacyGenerator

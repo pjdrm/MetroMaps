@@ -28,6 +28,7 @@ class SegDocumentsGenerator(object):
         utils.myutils.rmDir(self.domain)
         os.makedirs(self.domain + "/data/")
         os.makedirs(self.domain + "/data/rawtext/")
+        os.makedirs(self.domain + "/data/swtext")
         os.makedirs(self.domain + "/out/")
         os.makedirs(self.domain + "/out/final")
         dicts = []

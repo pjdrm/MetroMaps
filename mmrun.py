@@ -69,9 +69,9 @@ def Run_clustering_handler(configs):
     clustering_configs = configs.get('clustering',{})
     if (clustering_configs.get('mode')):
         logging.info("Running clustering handler")
-        clustering_handler = mm.mapgen.cluster_generator.ClusterGenerator(configs.get('clustering'))
-        clustering_handler.run()
-        clustering_handler.write()
+        metro_station_generator_handler = mm.mapgen.metro_station_generator.factory(configs.get('clustering'))
+        metro_station_generator_handler.run()
+        metro_station_generator_handler.write()
 
 def Run_map_generator(configs):
     map_gen_configs = configs.get('mapgen')
