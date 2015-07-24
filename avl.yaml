@@ -43,7 +43,7 @@ slicing:
 clustering:
     <<: *GLOBALS
     mode: on
-    type: cluster_generator_rake
+    type: cluster_generator_cp
     minchars: 3
     maxwords: 3
     minfreq: 2
