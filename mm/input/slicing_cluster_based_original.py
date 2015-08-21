@@ -6,10 +6,6 @@ Created on 21/07/2015
 import numpy as np
 import json
 import glob
-import math
-import logging
-import os
-import slicer_factory
 from sklearn.cluster import MeanShift, estimate_bandwidth, KMeans, AffinityPropagation, DBSCAN, AgglomerativeClustering
 from sklearn.metrics.pairwise import cosine_similarity
 from gensim.models.doc2vec import LabeledSentence, Doc2Vec
@@ -56,20 +52,32 @@ def gen_labled_sent(dirPath):
         uid += 1
     return sentences
             
-class SlicingClusterBased(slicer_factory.SlicingHandlerGenerator):
+class SlicingClusterBased(object):
     '''
     classdocs
     '''
-    def __init__(self, legacy_helper_config_dict):
-        super(SlicingClusterBased, self).__init__(legacy_helper_config_dict)
-        self.doc_keys = self.data["doc_counts"].keys()
-        self.global_counts = self.data["global_counts"]
-        self.vocab_size = len(self.global_counts.keys())
-        self.max_token_counts, self.num_docs_with_term = self.token_stats(self.doc_counts)
-        self.pos_doc_dic = {}
-        self.cluster_elms = self.createElements()
-        #self.token_pos_dic, self.vocab_size, self. n_docs = self.getTokenPosDic()
+
+
+    def __init__(self, doc_json_path):
+        with open(doc_json_path) as in_json:
+            self.docs_data = json.load(in_json)
+            
+        self.token_pos_dic, self.vocab_size, self. n_docs = self.getTokenPosDic()
        
+    def getTokenPosDic(self):
+        token_pos_dic = {}
+        i = 0
+        n_docs = 0
+        for docs in self.docs_data:
+            for doc_data in docs["doc_data"]:
+                n_docs += 1
+                for token in doc_data["tokens"]:
+                    word = token["plaintext"]
+                    if not token_pos_dic.get(word, False):
+                        token_pos_dic[word] = i
+                        i += 1
+        return token_pos_dic, i, n_docs
+        
     def kmeans(self, samples):
         num_clusters = 7
         km = KMeans(n_clusters=num_clusters)
@@ -97,31 +105,37 @@ class SlicingClusterBased(slicer_factory.SlicingHandlerGenerator):
         return ac.labels_
         
     def slice(self):
-        elements = self.cluster_elms
+        elements = self.createElements()
         #elements = self.createElemntsDoc2Vec()
-        cluster_labels = self.kmeans(elements)
-        print cluster_labels
+        labels = self.kmeans(elements)
+        print labels
         
-        labels_unique = np.unique(cluster_labels)
-        n_clusters = len(labels_unique)
+        labels_unique = np.unique(labels)
+        n_clusters_ = len(labels_unique)
+        print("number of estimated clusters : %d" % n_clusters_)
+        print("accuracy : %f" % eval(labels, [0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6]))
         
-        clusters = [[] for i in range(n_clusters)]
-        for i, cluster_label in enumerate(cluster_labels):
-            clusters[cluster_label].append(self.getDoc(i))
-        
-        self.write(clusters)
+        '''
+        for i in range(len(elements)):
+            print "segment %d" % (i + 1)
+            for j in range(len(elements)):
+                if i == j:
+                    continue
+                print "%d: %f" % (j + 1, cosine_similarity(elements[i], elements[j])[0])
+            print "----------"
+        '''
             
 
         
     def createElements(self):
-        elements = np.zeros(shape=(self.num_docs, self.vocab_size))
+        elements = np.zeros(shape=(self.n_docs, self.vocab_size))
         i = 0
-        for doc_id in self.doc_keys:
-            self.pos_doc_dic[i] = doc_id
-            for token_id, count in self.doc_counts[doc_id].iteritems():
-                tfidf_score = self.tfidf(token_id, doc_id)
-                elements[i][int(token_id)-1] = tfidf_score
-            i += 1
+        for docs in self.docs_data:
+            for doc_data in docs["doc_data"]:
+                for token in doc_data["tokens"]:
+                    pos = self.token_pos_dic[token["plaintext"]]
+                    elements[i][pos] = token["tfidf"]
+                i += 1
         return elements
     
     def createElemntsDoc2Vec(self):
@@ -138,24 +152,15 @@ class SlicingClusterBased(slicer_factory.SlicingHandlerGenerator):
         elements = [model.docvecs[key] for key in  model.docvecs.__dict__['doctags'].keys()]
         return elements
     
-    def getDoc(self, pos):
-        doc_id = int(self.pos_doc_dic[pos])
-        for doc in self.doc_metadata:
-            if doc["id"] == doc_id:
-                return doc
-    
 def eval(labels, reference):
     correct = 0.0
     for label, ref in zip(labels, reference):
         if label == ref:
             correct += 1.0
     return correct / len(labels)
- 
-def construct(config):
-    return SlicingClusterBased(config)  
-   
-#test = SlicingClusterBased("/tmp/legacy_handler_out.json")
-#test.slice()
+    
+test = SlicingClusterBased("/tmp/legacy_handler_out.json")
+test.slice()
     
     
                 

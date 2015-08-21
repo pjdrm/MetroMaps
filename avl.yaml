@@ -36,6 +36,7 @@ input_helper:
 slicing:
     <<: *GLOBALS
     mode: on
+    type: slicing_cluster_based
     output_dir: /tmp/query_result
     num_timeslices: 7
     output_json: &score_JSON /tmp/legacy_handler_out.json
@@ -43,7 +44,7 @@ slicing:
 clustering:
     <<: *GLOBALS
     mode: on
-    type: cluster_generator_cp
+    type: cluster_generator_rake
     minchars: 3
     maxwords: 3
     minfreq: 2

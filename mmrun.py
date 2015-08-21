@@ -10,6 +10,7 @@ import logging
 import yaml.composer
 import os
 import mm.input.generator.factory
+import mm.input.slicer_factory
 
 def rmDir(top):
     for root, dirs, files in os.walk(top, topdown=False):
@@ -61,8 +62,8 @@ def Run_slicing_handler(configs):
     legacy_configs = configs.get('slicing')
     if (legacy_configs.get('mode')):
         logging.info("Converting to legacy format")
-        legacy_handler = mm.input.SlicingHandler(legacy_configs)
-        legacy_handler.write()
+        legacy_handler = mm.input.slicer_factory.factory(legacy_configs)
+        legacy_handler.slice()
         logging.info("Legacy format written to %s" %(legacy_configs.get('output_dir')))
 
 def Run_clustering_handler(configs):
