@@ -36,7 +36,7 @@ input_helper:
 slicing:
     <<: *GLOBALS
     mode: on
-    type: slicing_cluster_based
+    type: slicing_time_based
     output_dir: /tmp/query_result
     num_timeslices: 7
     output_json: &score_JSON /tmp/legacy_handler_out.json

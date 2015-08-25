@@ -44,11 +44,13 @@ def log(*args):
 class Cluster:
     #informat: clusterid word1 word2 ...
     def __init__(self, line):
-        tokens = line.split()
-        self.clusterid = tokens[0]
-        self.words = set([])
-        for word in tokens[1:]:
-            self.words.add(word)
+        lineSplit = line.split(' ', 1)
+        self.clusterid = lineSplit[0]
+        tokens = lineSplit[1].split(', ')
+        self.words = []
+        for word in tokens:
+            self.words.append(word + ', ')
+        self.words[-1] = self.words[-1][:-1]
 
     def serialize(self):
         result = self.clusterid+" "
