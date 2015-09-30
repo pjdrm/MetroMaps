@@ -106,6 +106,11 @@ class ClusterGeneratorCP(metro_station_generator.MetroStationGenerator):
                 g.AddEdge(int(node_1), int(node_2))
                 node_degrees[int(node_1)] = node_degrees.get(int(node_1), 0) + 1
                 node_degrees[int(node_2)] = node_degrees.get(int(node_2), 0) + 1
+        counter = 0
+        for NI in g.Nodes():
+            print "node: %d, out-degree %d, in-degree %d" % ( NI.GetId(), NI.GetOutDeg(), NI.GetInDeg())
+            counter +=1
+        print "number of nodes: %d" % (counter)
         return (g, node_degrees, id_to_token)
 
     @property

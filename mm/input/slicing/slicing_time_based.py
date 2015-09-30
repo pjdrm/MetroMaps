@@ -4,7 +4,7 @@ import json
 import os.path
 import os
 import logging
-from mm.input import slicer_factory
+from mm.input.slicing import slicer_factory
 from itertools import combinations
 
 class SlicingHandler(slicer_factory.SlicingHandlerGenerator):

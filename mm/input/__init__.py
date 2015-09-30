@@ -1,4 +1,4 @@
-from mm.input.slicing_time_based import SlicingHandler
+from mm.input.slicing.slicing_time_based import SlicingHandler
 
 
 def ReadConfig(configs):
