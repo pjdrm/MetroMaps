@@ -2,3 +2,13 @@
 *.swp
 domains/lotr/out
 /domains
+/big_clam_slicing.txt
+/bigclam.stdout
+/clique_precolation_slicing.txt
+/cnm_slicing.txt
+/girvan_newman_slicing.txt
+/graph_file.txt
+/graph.gexf
+/louvain_slicing.txt
+/whitelist_avl_clean_stems.txt
+/whitelist_avl_clean.txt

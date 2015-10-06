@@ -149,7 +149,9 @@ class SlicingLouvain(slicing_graph_based.SlicingGraphBased):
         return self.getCommunities(vertexCluster)
     
     def run(self):
-        return self.louvain()
+        communities = self.louvain()
+        self.print_communities(communities)
+        return communities
     
 def construct(config):
     return SlicingLouvain(config)  

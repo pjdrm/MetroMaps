@@ -109,3 +109,13 @@ class SlicingGraphBased(slicer_factory.SlicingHandlerGenerator):
                 score += 1
         normalized_score = score / len(comm["cluster_tokens"])
         return normalized_score
+    
+    def print_communities(self, communities):
+        str = ''
+        for community in communities:
+            for word in community['cluster_tokens']:
+                str += word + ', '
+            str = str[:-2]
+            str += '\n\n'
+        str = str[:-2]   
+        print str

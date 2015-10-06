@@ -23,4 +23,4 @@ class WeightBestTFIDF(object):
             self.graph_slicer.g.es[edgeid]['weight'] = weight
             
 def construct(graph_slicer):
-    return WeightBestTFIDF(graph_slicer) 
+    return WeightBestTFIDF(graph_slicer)

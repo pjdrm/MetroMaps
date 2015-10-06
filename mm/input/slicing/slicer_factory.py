@@ -144,7 +144,7 @@ class SlicingHandlerGenerator(object):
 
         with open(self.output_json,'w') as output_json:
             json.dump(clusters_data, output_json)   
-            logging.info('Scoring JSON info written to %s'%self.output_json)
+            logging.info('Scoring JSON info written to %s'%self.output_json)              
 
 def isGraphAlg(module_name):
     graph_algs = {
