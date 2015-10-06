@@ -16,7 +16,7 @@ class SlicingGraphBased(slicer_factory.SlicingHandlerGenerator):
     def __init__(self, legacy_helper_config_dict):
         super(SlicingGraphBased, self).__init__(legacy_helper_config_dict)
         self.doc_keys = self.data["doc_counts"].keys()
-        self.id_to_token = {v: k for k, v in self.data["global_tokens"].items()}
+        self.token_to_word = {v: k for k, v in self.data["global_tokens"].items()}
         self.k = 5
         self.max_tokens = 50
     
@@ -62,7 +62,7 @@ class SlicingGraphBased(slicer_factory.SlicingHandlerGenerator):
         communities = self.run()
         for cluster in communities:
             print "%d %s" % (len(cluster["cluster_tokens"]), cluster["cluster_tokens"])
-        mapping = self.mapSegsComm(communities, self.id_to_token, self.data["doc_counts"])
+        mapping = self.mapSegsComm(communities, self.token_to_word, self.data["doc_counts"])
         self.write(mapping)
     
     def printComms(self, communitites):

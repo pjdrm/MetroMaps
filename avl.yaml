@@ -37,7 +37,8 @@ input_helper:
 slicing:
     <<: *GLOBALS
     mode: on
-    type: slicing_cnm
+    type: slicing_louvain
+    weight_calculator: best_tfidf
     output_dir: /tmp/query_result
     num_timeslices: 7
     output_json: &score_JSON /tmp/legacy_handler_out.json

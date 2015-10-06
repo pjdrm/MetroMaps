@@ -22,7 +22,7 @@ class SlicingGirvanNewman(slicing_graph_based.SlicingGraphBased):
         for C in CmtyV:
             cluster_k = []
             for Node in C:
-                token = self.id_to_token[Node]
+                token = self.token_to_word[Node]
                 cluster_k += [token]
             cluster_d = {'cluster_tokens': cluster_k, 'k': self.k}
             community_list += [cluster_d]

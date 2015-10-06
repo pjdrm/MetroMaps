@@ -7,7 +7,6 @@ import math
 import logging
 import os
 import json
-from Cython.Compiler.Main import module_name_pattern
 
 class SlicingHandlerGenerator(object):
     def __init__(self, legacy_helper_config_dict):
@@ -152,7 +151,9 @@ def isGraphAlg(module_name):
         "slicing_girvan_newman" : True,
         "slicing_clique_precolation" : True,
         "slicing_bigclam" : True,
-        "slicing_cnm" : True
+        "slicing_cnm" : True,
+        "slicing_asyn_lpa" : True,
+        "slicing_louvain" : True
     }
     return graph_algs.get(module_name, False)
 

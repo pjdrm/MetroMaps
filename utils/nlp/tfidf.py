@@ -32,6 +32,7 @@ def getkeywords(path, n, customSWFile):
     for i in range(0, len(dense)-1):
         doc = dense[i].tolist()[0]
         doc_scores = [pair for pair in zip(range(0, len(doc)), doc) if pair[1] > 0]
+        #doc_scores = [pair for pair in zip(range(0, len(doc)), doc)]
         sorted_doc_scores = sorted(doc_scores, key=lambda t: t[1] * -1)
         for word, score in [(feature_names[word_id], score) for (word_id, score) in sorted_doc_scores][:n]:
             #print('{0: <20} {1}'.format(word, score))

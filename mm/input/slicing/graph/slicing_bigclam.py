@@ -49,7 +49,7 @@ class SlicingBigClam(slicing_graph_based.SlicingGraphBased):
             for community in communities:
                 cluster_k = []
                 for Node in community.split():
-                    token = self.id_to_token[int(Node)]
+                    token = self.token_to_word[int(Node)]
                     cluster_k += [token]
                 cluster_d = {'cluster_tokens': cluster_k}
                 community_list += [cluster_d]
