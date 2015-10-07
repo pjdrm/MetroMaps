@@ -60,8 +60,10 @@ class SlicingGraphBased(slicer_factory.SlicingHandlerGenerator):
     
     def slice(self):
         communities = self.run()
+        '''
         for cluster in communities:
             print "%d %s" % (len(cluster["cluster_tokens"]), cluster["cluster_tokens"])
+        '''
         mapping = self.mapSegsComm(communities, self.token_to_word, self.data["doc_counts"])
         self.write(mapping)
     
@@ -110,7 +112,7 @@ class SlicingGraphBased(slicer_factory.SlicingHandlerGenerator):
         normalized_score = score / len(comm["cluster_tokens"])
         return normalized_score
     
-    def print_communities(self, communities):
+    def print_communities(self, communities, outFilePath):
         str = ''
         for community in communities:
             for word in community['cluster_tokens']:
@@ -119,3 +121,5 @@ class SlicingGraphBased(slicer_factory.SlicingHandlerGenerator):
             str += '\n\n'
         str = str[:-2]   
         print str
+        with open(outFilePath, 'w') as file:
+            file.write(str)

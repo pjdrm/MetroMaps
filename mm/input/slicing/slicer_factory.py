@@ -153,7 +153,15 @@ def isGraphAlg(module_name):
         "slicing_bigclam" : True,
         "slicing_cnm" : True,
         "slicing_asyn_lpa" : True,
-        "slicing_louvain" : True
+        "slicing_louvain" : True,
+        "slicing_edge_betweenness" : True,
+        "slicing_community_fastgreedy" : True,
+        "slicing_leading_eigenvector" : True,
+        "slicing_label_propagation" : True,
+        "slicing_community_multilevel" : True,
+        "slicing_optimal_modularity" : True,
+        "slicing_spinglass" : True,
+        "slicing_walktraps" : True
     }
     return graph_algs.get(module_name, False)
 
