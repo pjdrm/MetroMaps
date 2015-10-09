@@ -10,8 +10,8 @@ import snap
 import mm.input.slicing.graph.slicing_graph_based as slicing_graph_based
 
 class SlicingCP(slicing_graph_based.SlicingGraphBased):
-    def __init__(self, legacy_helper_config_dict):
-        super(SlicingCP, self).__init__(legacy_helper_config_dict)
+    def __init__(self, slicer_configs):
+        super(SlicingCP, self).__init__(slicer_configs)
         self.g = self.createGraph()
     
     def best_clique_precolation(self):

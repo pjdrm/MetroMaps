@@ -3,7 +3,6 @@
 import argparse
 import mm.inputhelpers.factory
 import mm.inputhelpers.preprocessing
-import mm.input
 import mm.mapgen
 import mm.viz
 import logging

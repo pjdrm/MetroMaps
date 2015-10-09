@@ -8,11 +8,11 @@ from mm.input.slicing import slicer_factory
 from itertools import combinations
 
 class SlicingHandler(slicer_factory.SlicingHandlerGenerator):
-    def __init__(self, legacy_helper_config_dict):
-        super(SlicingHandler, self).__init__(legacy_helper_config_dict)
+    def __init__(self, slicer_configs):
+        super(SlicingHandler, self).__init__(slicer_configs)
         self.global_tokens = self.data['global_tokens']
         self.global_counts = self.data['global_counts']
-        self.num_clusters = int(legacy_helper_config_dict['num_timeslices'])
+        self.num_clusters = int(slicer_configs['num_timeslices'])
         self.max_token_counts, self.num_docs_with_term = self.token_stats(self.doc_counts)
     
     def slice(self):

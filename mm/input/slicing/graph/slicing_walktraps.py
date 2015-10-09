@@ -18,24 +18,32 @@ from wrapper.iGraphWrapper import iGraphWrapper
 import os
 
 class SlicingWalktraps(slicing_graph_based.SlicingGraphBased):
-    def __init__(self, legacy_helper_config_dict):
-        super(SlicingWalktraps, self).__init__(legacy_helper_config_dict)
+    def __init__(self, slicer_configs):
+        super(SlicingWalktraps, self).__init__(slicer_configs)
         self.igraphWrapper = iGraphWrapper(self)
         self.g = self.igraphWrapper.createGraph()
-        self.weightcalc = factory(legacy_helper_config_dict, self.igraphWrapper)
+        self.weightcalc = factory(slicer_configs, self.igraphWrapper)
         self.weightcalc.calculateWeights()
-        self.wc_des = legacy_helper_config_dict['weight_calculator']
+        self.wc_des = slicer_configs['weight_calculator']
+        self.plotGraph(self.g, self.igraphWrapper.node_to_token_dic, "graph_plots/co-occurrence_"+self.wc_des+".png")
         
-    def walktraps(self):
-        vertexCluster =  self.g.community_walktrap(weights="weight").as_clustering()
+    def walktraps(self, steps):
+        vertexCluster =  self.g.community_walktrap(weights="weight", steps=steps).as_clustering()
         return self.igraphWrapper.getCommunities(vertexCluster)
     
     def run(self):
-        communities = self.walktraps()
+        maxSize = 0;
+        for i in range(1,50):
+            communities = self.walktraps(i)
+            lenComm = len(communities)
+            if lenComm > maxSize:
+                maxSize = lenComm
+                bestComm = communities
+            
         directory = 'slicing_results/walktraps/'
         if not os.path.exists(directory):
             os.makedirs(directory)
-        self.print_communities(communities, directory + self.wc_des + ".txt")
+        self.print_communities(bestComm, directory + self.wc_des + ".txt")
         return communities
     
 def construct(config):

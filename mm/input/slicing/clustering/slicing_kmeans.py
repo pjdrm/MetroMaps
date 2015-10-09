@@ -12,8 +12,8 @@ from sklearn.cluster import KMeans
 import mm.input.slicing.clustering.slicing_cluster_based as slicing_cluster_based
 
 class SlicingKmeans(slicing_cluster_based.SlicingClusterBased):
-    def __init__(self, legacy_helper_config_dict):
-        super(SlicingKmeans, self).__init__(legacy_helper_config_dict)
+    def __init__(self, slicer_configs):
+        super(SlicingKmeans, self).__init__(slicer_configs)
         self.num_clusters = 7
         
     def kmeans(self, samples):

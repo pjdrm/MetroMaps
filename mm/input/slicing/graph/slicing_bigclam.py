@@ -13,8 +13,8 @@ import subprocess
 import mm.input.slicing.graph.slicing_graph_based as slicing_graph_based
 
 class SlicingBigClam(slicing_graph_based.SlicingGraphBased):
-    def __init__(self, legacy_helper_config_dict):
-            super(SlicingBigClam, self).__init__(legacy_helper_config_dict)
+    def __init__(self, slicer_configs):
+            super(SlicingBigClam, self).__init__(slicer_configs)
             self.g = self.createGraph()
     
     '''

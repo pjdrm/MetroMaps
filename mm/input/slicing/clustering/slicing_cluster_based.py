@@ -15,8 +15,8 @@ import numpy as np
 import glob
 
 class SlicingClusterBased(slicer_factory.SlicingHandlerGenerator):
-    def __init__(self, legacy_helper_config_dict):
-        super(SlicingClusterBased, self).__init__(legacy_helper_config_dict)
+    def __init__(self, slicer_configs):
+        super(SlicingClusterBased, self).__init__(slicer_configs)
         self.doc_keys = self.data["doc_counts"].keys()
         self.global_counts = self.data["global_counts"]
         self.vocab_size = len(self.global_counts.keys())

@@ -12,8 +12,8 @@ from sklearn.cluster import AgglomerativeClustering
 import mm.input.slicing.clustering.slicing_cluster_based as slicing_cluster_based
 
 class SlicingAgglomerativeClustering(slicing_cluster_based.SlicingClusterBased):
-    def __init__(self, legacy_helper_config_dict):
-        super(SlicingAgglomerativeClustering, self).__init__(legacy_helper_config_dict)
+    def __init__(self, slicer_configs):
+        super(SlicingAgglomerativeClustering, self).__init__(slicer_configs)
         self.linkage = 'ward'
         
     def agglomerative_clustering(self, samples):

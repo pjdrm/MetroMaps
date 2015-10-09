@@ -11,8 +11,8 @@ import mm.input.slicing.clustering.slicing_cluster_based as slicing_cluster_base
 from sklearn.cluster import MeanShift
 
 class SlicingMeanShift(slicing_cluster_based.SlicingClusterBased):
-    def __init__(self, legacy_helper_config_dict):
-        super(SlicingMeanShift, self).__init__(legacy_helper_config_dict)
+    def __init__(self, slicer_configs):
+        super(SlicingMeanShift, self).__init__(slicer_configs)
         self.bandwidth = 14
         #self.bandwidth = estimate_bandwidth(elements, quantile=0.3, n_samples=None)
         

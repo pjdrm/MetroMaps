@@ -9,20 +9,20 @@ import os
 import json
 
 class SlicingHandlerGenerator(object):
-    def __init__(self, legacy_helper_config_dict):
+    def __init__(self, slicer_configs):
         self.data = {}
-        with open(legacy_helper_config_dict['mm_standard_input']) as in_json, open(legacy_helper_config_dict['doc_metadata']) as doc_meta_json:
+        with open(slicer_configs['mm_standard_input']) as in_json, open(slicer_configs['doc_metadata']) as doc_meta_json:
             self.data = json.load(in_json)
             self.doc_metadata = json.load(doc_meta_json)
-        self.output_dir = legacy_helper_config_dict['output_dir']
+        self.output_dir = slicer_configs['output_dir']
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir)
-        self.output_json = legacy_helper_config_dict['output_json']
+        self.output_json = slicer_configs['output_json']
         self.repr_tokens = self.data['representative_tokens']
         self.doc_counts = self.data['doc_counts']
         self.num_docs = len(self.doc_counts)
         self.max_token_counts, self.num_docs_with_term = self.token_stats(self.doc_counts)
-        self.min_freq_in_doc = int(legacy_helper_config_dict.get('min_freq_in_doc'))
+        self.min_freq_in_doc = int(slicer_configs.get('min_freq_in_doc'))
         
     def token_stats(self, doc_counts):
             token_max = {} # maps token_id -> max doc frequency
@@ -152,14 +152,12 @@ def isGraphAlg(module_name):
         "slicing_clique_precolation" : True,
         "slicing_bigclam" : True,
         "slicing_cnm" : True,
-        "slicing_asyn_lpa" : True,
         "slicing_louvain" : True,
         "slicing_edge_betweenness" : True,
         "slicing_community_fastgreedy" : True,
         "slicing_leading_eigenvector" : True,
         "slicing_label_propagation" : True,
         "slicing_community_multilevel" : True,
-        "slicing_optimal_modularity" : True,
         "slicing_spinglass" : True,
         "slicing_walktraps" : True
     }
@@ -176,8 +174,8 @@ def isClusterAlg(module_name):
     return graph_algs.get(module_name, False)
 
 def factory(configs):
-    metro_station_generator_configs = configs
-    input_generator_name = metro_station_generator_configs['type']
+    slicer_configs = configs
+    input_generator_name = slicer_configs['type']
     fromlist = [0]
     if isGraphAlg(input_generator_name):
         input_generator_name = "graph."+input_generator_name
@@ -186,4 +184,4 @@ def factory(configs):
         input_generator_name = "clustering."+input_generator_name
     
     generator_module = __import__(input_generator_name, globals=globals(), fromlist = fromlist)
-    return generator_module.construct(metro_station_generator_configs)
+    return generator_module.construct(slicer_configs)

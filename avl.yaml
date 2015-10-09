@@ -3,7 +3,7 @@ global: &GLOBALS
     doc_metadata: domains/avl/data/doc_meta.json
     mm_standard_input: /tmp/mm_input.json
     domain: domains/avl
-    min_freq_in_doc: 3
+    min_freq_in_doc: 2
 
 input_generator:
     <<: *GLOBALS
@@ -37,10 +37,11 @@ input_helper:
 slicing:
     <<: *GLOBALS
     mode: on
-    type: slicing_leading_eigenvector
+    type: slicing_walktraps
     weight_calculator: count
-    output_dir: /tmp/query_result
+    maxNodes: 50
     num_timeslices: 7
+    output_dir: /tmp/query_result
     output_json: &score_JSON /tmp/legacy_handler_out.json
 
 clustering:
@@ -52,7 +53,7 @@ clustering:
     minfreq: 2
     minscore: 1.0
     tfidf_accept: 0
-    max_tokens_per_doc: 50
+    max_tokens_per_doc: 20
     similarity_merge: .95 # <intersection> / <small size> above this limit merges
     dilution_merge: .1
     graphing: off

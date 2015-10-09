@@ -11,14 +11,22 @@ from which word clusters will be extracted in the next step of the pipeline.
 import snap
 from itertools import combinations
 from mm.input.slicing import slicer_factory
+from igraph import plot
+from colour import Color
+from math import ceil
+from matplotlib import pyplot
+import matplotlib as mpl
+import matplotlib.image as mpimg
+import numpy as np
+import os
 
 class SlicingGraphBased(slicer_factory.SlicingHandlerGenerator):
-    def __init__(self, legacy_helper_config_dict):
-        super(SlicingGraphBased, self).__init__(legacy_helper_config_dict)
+    def __init__(self, slicer_configs):
+        super(SlicingGraphBased, self).__init__(slicer_configs)
         self.doc_keys = self.data["doc_counts"].keys()
         self.token_to_word = {v: k for k, v in self.data["global_tokens"].items()}
         self.k = 5
-        self.max_tokens = 50
+        self.max_tokens = int(slicer_configs['maxNodes'])
     
     '''
     Creates a co-occurrence graph from the set of documents. The graph is
@@ -123,3 +131,65 @@ class SlicingGraphBased(slicer_factory.SlicingHandlerGenerator):
         print str
         with open(outFilePath, 'w') as file:
             file.write(str)
+        
+    '''
+    Function that plots a word co-occurrence graph.
+    Edges are colored according to their corresponding weights.
+    
+    Note: only work for graph object from the igraph package.
+    '''
+    def plotGraph(self, graph, node_to_token_dic, figFilePath):
+        '''
+        Creating gradient color scheme for the graph edges. Green edges
+        have the minimum found weight and red edges the maximum.
+        '''
+        n_colors = 20
+        green = Color("green")
+        colors = list(green.range_to(Color("red"), n_colors))
+        weights = graph.es['weight']
+        maxW = max(weights)
+        minW = min(weights)
+        binSize = (maxW - minW)/n_colors
+        edgeColors = []
+        for w in weights:
+            colorBin = int(ceil((w-minW)/binSize)-1)
+            if colorBin == -1:
+                colorBin = 0
+            color = colors[colorBin]
+            edgeColors.append(color.get_rgb())
+            
+        if os.path.isfile(figFilePath):
+            os.remove(figFilePath)
+        fig = pyplot.figure(figsize=(15, 15))
+        axplot = fig.add_axes([0.15, 0.07, 0.7, 0.06], label='Edge weight value')
+        cmap = mpl.colors.ListedColormap([color.get_rgb() for color in colors])
+        norm = mpl.colors.Normalize(vmin=minW, vmax=maxW)
+        colorBar = mpl.colorbar.ColorbarBase(axplot, cmap=cmap,
+                                   norm=norm,
+                                   orientation='horizontal')
+        colorBar.set_label('Edge weight value')
+        ax = colorBar.ax
+        text = ax.xaxis.label
+        font = mpl.font_manager.FontProperties(size=18)
+        text.set_font_properties(font)
+        
+        nodeLabels = [self.token_to_word[node_to_token_dic[nodeIndex]] for nodeIndex in range(graph.vcount())]
+        visual_style = {}
+        
+        outdegree = graph.outdegree()
+        bins = np.linspace(0, max(outdegree), n_colors)  
+        digitized_degrees =  np.digitize(outdegree, bins)
+        graph.vs["color"] = [colors[x-1] for x in digitized_degrees]
+        N = graph.vcount()
+        visual_style["layout"] = graph.layout_fruchterman_reingold(weights=graph.es["weight"], maxiter=1000, area=N**3, repulserad=N**3)
+        
+        visual_style["vertex_label"] = nodeLabels
+        visual_style["vertex_color"] = ["blue" for i in range(len(nodeLabels))]
+        visual_style["vertex_label_dist"] = 1
+        visual_style["edge_color"] = edgeColors
+        plot(graph, figFilePath, margin = 40, **visual_style)
+        img = mpimg.imread(figFilePath)
+        axplot = fig.add_axes([0.05, 0.15, 1, 0.8])
+        axplot.axis('off')
+        axplot.imshow(img)
+        fig.savefig(figFilePath)

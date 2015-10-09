@@ -13,8 +13,8 @@ import mm.input.slicing.clustering.slicing_cluster_based as slicing_cluster_base
 from sklearn.metrics.pairwise import cosine_similarity
 
 class SlicingDBSCAN(slicing_cluster_based.SlicingClusterBased):
-    def __init__(self, legacy_helper_config_dict):
-        super(SlicingDBSCAN, self).__init__(legacy_helper_config_dict)
+    def __init__(self, slicer_configs):
+        super(SlicingDBSCAN, self).__init__(slicer_configs)
         self.eps = 0.1
         self.min_samples = 2
         self.metric = cosine_similarity

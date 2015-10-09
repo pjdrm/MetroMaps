@@ -18,13 +18,13 @@ from wrapper.iGraphWrapper import iGraphWrapper
 import os
 
 class SlicingLabelPropagation(slicing_graph_based.SlicingGraphBased):
-    def __init__(self, legacy_helper_config_dict):
-        super(SlicingLabelPropagation, self).__init__(legacy_helper_config_dict)
+    def __init__(self, slicer_configs):
+        super(SlicingLabelPropagation, self).__init__(slicer_configs)
         self.igraphWrapper = iGraphWrapper(self)
         self.g = self.igraphWrapper.createGraph()
-        self.weightcalc = factory(legacy_helper_config_dict, self.igraphWrapper)
+        self.weightcalc = factory(slicer_configs, self.igraphWrapper)
         self.weightcalc.calculateWeights()
-        self.wc_des = legacy_helper_config_dict['weight_calculator']
+        self.wc_des = slicer_configs['weight_calculator']
         
         
     def label_propagation(self):

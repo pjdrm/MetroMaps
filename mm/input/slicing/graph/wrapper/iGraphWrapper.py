@@ -92,8 +92,7 @@ class iGraphWrapper(object):
                 else:
                     edgeid = g.get_eid(intnode1, intnode2)
                     w = g.es[edgeid]['count']
-                    g.es[edgeid]['count'] = w + 1.0
-                    
+                    g.es[edgeid]['count'] = w + 1.0          
         return g
     
     '''
