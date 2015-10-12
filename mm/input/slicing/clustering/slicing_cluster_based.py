@@ -36,6 +36,7 @@ class SlicingClusterBased(slicer_factory.SlicingHandlerGenerator):
             clusters[cluster_label].append(self.getDoc(i))
         
         self.write(clusters)
+        return clusters
         
     '''
     Computes the bag of words features representation of the

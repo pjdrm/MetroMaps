@@ -37,8 +37,8 @@ input_helper:
 slicing:
     <<: *GLOBALS
     mode: on
-    type: slicing_walktraps
-    weight_calculator: count
+    type: slicing_bigclam
+    weight_calculator: count_best_tfidf
     maxNodes: 50
     num_timeslices: 7
     output_dir: /tmp/query_result

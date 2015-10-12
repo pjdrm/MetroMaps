@@ -36,7 +36,7 @@ class SlicingEdgeBetweeness(slicing_graph_based.SlicingGraphBased):
         directory = 'slicing_results/edge_betweenness/'
         if not os.path.exists(directory):
             os.makedirs(directory)
-        self.print_communities(communities, directory + self.wc_des + ".txt")
+        #self.print_communities(communities, directory + self.wc_des + ".txt")
         return communities
     
 def construct(config):

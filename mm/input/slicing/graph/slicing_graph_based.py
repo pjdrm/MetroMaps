@@ -74,6 +74,7 @@ class SlicingGraphBased(slicer_factory.SlicingHandlerGenerator):
         '''
         mapping = self.mapSegsComm(communities, self.token_to_word, self.data["doc_counts"])
         self.write(mapping)
+        return mapping
     
     def printComms(self, communitites):
         print "Words in some community"
@@ -173,17 +174,20 @@ class SlicingGraphBased(slicer_factory.SlicingHandlerGenerator):
         font = mpl.font_manager.FontProperties(size=18)
         text.set_font_properties(font)
         
-        nodeLabels = [self.token_to_word[node_to_token_dic[nodeIndex]] for nodeIndex in range(graph.vcount())]
+        degrees = graph.degree()
+        nodeLabels = [self.token_to_word[node_to_token_dic[nodeIndex]] + " (" + str(degree) + ")"  for nodeIndex, degree in enumerate(degrees)]
         visual_style = {}
         
-        outdegree = graph.outdegree()
-        bins = np.linspace(0, max(outdegree), n_colors)  
-        digitized_degrees =  np.digitize(outdegree, bins)
+        
+        bins = np.linspace(0, max(degrees), n_colors)  
+        digitized_degrees =  np.digitize(degrees, bins)
         graph.vs["color"] = [colors[x-1] for x in digitized_degrees]
         N = graph.vcount()
         visual_style["layout"] = graph.layout_fruchterman_reingold(weights=graph.es["weight"], maxiter=1000, area=N**3, repulserad=N**3)
         
         visual_style["vertex_label"] = nodeLabels
+        visual_style["vertex_label_size"] = 12
+        visual_style["vertex_size"] = 3        
         visual_style["vertex_color"] = ["blue" for i in range(len(nodeLabels))]
         visual_style["vertex_label_dist"] = 1
         visual_style["edge_color"] = edgeColors
@@ -193,3 +197,4 @@ class SlicingGraphBased(slicer_factory.SlicingHandlerGenerator):
         axplot.axis('off')
         axplot.imshow(img)
         fig.savefig(figFilePath)
+        print ""
