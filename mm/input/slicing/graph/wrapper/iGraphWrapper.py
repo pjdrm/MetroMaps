@@ -59,6 +59,10 @@ class iGraphWrapper(object):
                 
                 
             token_ids = sorted(token_tfidf, key=lambda x : -token_tfidf[x])[:self.graph_slicer.max_tokens]
+            
+            len_token_ids = len(token_ids)
+            if len_token_ids == 0 or len_token_ids == 1:
+                continue
             token_ids_list.append(token_ids)
             
         n_nodes = len(set(chain(*token_ids_list)))
@@ -92,7 +96,7 @@ class iGraphWrapper(object):
                 else:
                     edgeid = g.get_eid(intnode1, intnode2)
                     w = g.es[edgeid]['count']
-                    g.es[edgeid]['count'] = w + 1.0          
+                    g.es[edgeid]['count'] = w + 1.0     
         return g
     
     '''
@@ -116,6 +120,7 @@ class iGraphWrapper(object):
         node_membership = vertexCluster.membership
         communities_list = [{'cluster_tokens' : [], 'k' : 5} for i in range(max(node_membership)+1)]
         for node_index, com_index in enumerate(node_membership):
+            print node_index
             communities_list[com_index]['cluster_tokens'].append(self.graph_slicer.token_to_word[self.node_to_token_dic[node_index]])
             
         comms_filtered = self.filterCommunities(communities_list, 2)

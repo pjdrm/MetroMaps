@@ -40,6 +40,7 @@ class SlicingBigClam(slicing_graph_based.SlicingGraphBased):
                 disk_stdout.write('\n\n\n==========\n')
                 disk_stdout.write("Return value: %s\n"%ret)
                 disk_stdout.flush()
+            os.remove("resources/bigclam/cmtyvv.txt")
             os.rename("cmtyvv.txt", "resources/bigclam/cmtyvv.txt")
                 
         def processBigclamOutput(output_file):

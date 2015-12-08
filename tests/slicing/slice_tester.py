@@ -21,12 +21,31 @@ def sliceTester(configs, test_configs):
     mmrun.Run_input_handler(configs)
     results_rand_index = {}
     results_slice_labels = {}
-    for  graph_alg in test_configs["slicing_igraph"]["algorithms"]:
-        slicing_configs = configs.get('slicing')
-        slicing_configs["type"] = graph_alg
-        for weight_scheme in test_configs["slicing_igraph"]["weight_schemes"]:
-            slicing_configs["weight_calculator"] = weight_scheme
-            print "Testing %s" % graph_alg + " " + weight_scheme
+    if "slicing_igraph" in test_configs:
+        for  graph_alg in test_configs["slicing_igraph"]["algorithms"]:
+            slicing_configs = configs.get('slicing')
+            slicing_configs["type"] = graph_alg
+            for weight_scheme in test_configs["slicing_igraph"]["weight_schemes"]:
+                slicing_configs["weight_calculator"] = weight_scheme
+                print "Testing %s" % graph_alg + " " + weight_scheme
+                slicing_clusters = mmrun.Run_slicing_handler(configs)
+                slicing_labels = [None]*len(slicing_true_labels)
+                label = 0
+                for slice_cluster in slicing_clusters:
+                    for el in slice_cluster:
+                        index = el['timestamp'] - 1
+                        slicing_labels[index] = label
+                    label += 1
+                        
+                rand_index = metrics.adjusted_rand_score(slicing_true_labels, slicing_labels)
+                results_rand_index[graph_alg + " " + weight_scheme] = rand_index
+                results_slice_labels[graph_alg + " " + weight_scheme] = ', '.join(str(e) for e in slicing_labels)
+      
+    if "slicing_other" in test_configs:       
+        for  cluster_alg in test_configs["slicing_other"]["algorithms"]:
+            slicing_configs = configs.get('slicing')
+            slicing_configs["type"] = cluster_alg
+            print "Testing %s" % cluster_alg
             slicing_clusters = mmrun.Run_slicing_handler(configs)
             slicing_labels = [None]*len(slicing_true_labels)
             label = 0
@@ -35,27 +54,10 @@ def sliceTester(configs, test_configs):
                     index = el['timestamp'] - 1
                     slicing_labels[index] = label
                 label += 1
-                    
+                        
             rand_index = metrics.adjusted_rand_score(slicing_true_labels, slicing_labels)
-            results_rand_index[graph_alg + " " + weight_scheme] = rand_index
-            results_slice_labels[graph_alg + " " + weight_scheme] = ', '.join(str(e) for e in slicing_labels)
-            
-    for  cluster_alg in test_configs["slicing_other"]["algorithms"]:
-        slicing_configs = configs.get('slicing')
-        slicing_configs["type"] = cluster_alg
-        print "Testing %s" % cluster_alg
-        slicing_clusters = mmrun.Run_slicing_handler(configs)
-        slicing_labels = [None]*len(slicing_true_labels)
-        label = 0
-        for slice_cluster in slicing_clusters:
-            for el in slice_cluster:
-                index = el['timestamp'] - 1
-                slicing_labels[index] = label
-            label += 1
-                    
-        rand_index = metrics.adjusted_rand_score(slicing_true_labels, slicing_labels)
-        results_rand_index[cluster_alg] = rand_index
-        results_slice_labels[cluster_alg] = ', '.join(str(e) for e in slicing_labels)
+            results_rand_index[cluster_alg] = rand_index
+            results_slice_labels[cluster_alg] = ', '.join(str(e) for e in slicing_labels)
             
             
     sorted_results = sorted(results_rand_index.items(), key=operator.itemgetter(1), reverse=True)
@@ -64,6 +66,7 @@ def sliceTester(configs, test_configs):
         strREsults += result[0] + "\t" + str(result[1]) + '\t[' + results_slice_labels[result[0]] +  ']\n'
     with open("resources/tests/results.txt","w") as results_file:    
         results_file.write(strREsults)
+    print "Finished tests"
 
 def main(config_file, test_configs, defaults="mm/default.yaml"):
     config_dict = {}

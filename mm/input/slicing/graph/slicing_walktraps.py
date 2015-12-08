@@ -25,7 +25,6 @@ class SlicingWalktraps(slicing_graph_based.SlicingGraphBased):
         self.weightcalc = factory(slicer_configs, self.igraphWrapper)
         self.weightcalc.calculateWeights()
         self.wc_des = slicer_configs['weight_calculator']
-        self.plotGraph(self.g, self.igraphWrapper.node_to_token_dic, "graph_plots/co-occurrence_"+self.wc_des+".png")
         
     def walktraps(self, steps):
         vertexCluster =  self.g.community_walktrap(weights="weight", steps=steps).as_clustering()

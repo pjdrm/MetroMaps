@@ -23,6 +23,7 @@ class SlicingHandlerGenerator(object):
         self.num_docs = len(self.doc_counts)
         self.max_token_counts, self.num_docs_with_term = self.token_stats(self.doc_counts)
         self.min_freq_in_doc = int(slicer_configs.get('min_freq_in_doc'))
+        self.dateIndex = 0
         
     def token_stats(self, doc_counts):
             token_max = {} # maps token_id -> max doc frequency
@@ -48,6 +49,7 @@ class SlicingHandlerGenerator(object):
     ''' Helper Functions for Writing '''
     def fakeDate(self, cluster_number, doc_number, time=False):
         ''' TODO: handle this more nicely '''
+        '''
         if not (cluster_number >= 0 and cluster_number < 12):
             cluster_number = 12 # temporary hack!
         assert(doc_number >= 0)
@@ -58,11 +60,14 @@ class SlicingHandlerGenerator(object):
         t = "%s%02i%02i" %("2013", cluster_number+1, doc_number+1)
         if time:
             t += '0000'
-        return t
+        '''
+        date = str(cluster_number) + '_' + str(doc_number) + '_' + str(self.dateIndex)
+        self.dateIndex
+        return date
 
     def write_docs_in_cluster(self, docs_in_cluster, ostream, cluster_index):
         doc_ids_in_cluster = [str(doc.get('id')) for doc in docs_in_cluster]
-        logging.debug('Files in cluster %i: %s-%s' % (cluster_index, doc_ids_in_cluster[0], doc_ids_in_cluster[-1]))
+        #logging.debug('Files in cluster %i: %s-%s' % (cluster_index, doc_ids_in_cluster[0], doc_ids_in_cluster[-1]))
         for doc_i, doc in enumerate(docs_in_cluster):
             doc_id = doc['id']
             doc_name = doc.get('name', 'untitled')

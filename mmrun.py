@@ -61,8 +61,8 @@ def Run_slicing_handler(configs):
     legacy_configs = configs.get('slicing')
     if (legacy_configs.get('mode')):
         logging.info("Converting to legacy format")
-        legacy_handler = mm.input.slicing.slicer_factory.factory(legacy_configs)
-        slicing = legacy_handler.slice()
+        slicing_handler = mm.input.slicing.slicer_factory.factory(legacy_configs)
+        slicing = slicing_handler.slice()
         logging.info("Legacy format written to %s" %(legacy_configs.get('output_dir')))
         return slicing
 

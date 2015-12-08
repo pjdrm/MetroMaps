@@ -19,6 +19,7 @@ import matplotlib as mpl
 import matplotlib.image as mpimg
 import numpy as np
 import os
+from random import randint
 
 class SlicingGraphBased(slicer_factory.SlicingHandlerGenerator):
     def __init__(self, slicer_configs):
@@ -68,6 +69,7 @@ class SlicingGraphBased(slicer_factory.SlicingHandlerGenerator):
     
     def slice(self):
         communities = self.run()
+        
         '''
         for cluster in communities:
             print "%d %s" % (len(cluster["cluster_tokens"]), cluster["cluster_tokens"])
@@ -139,7 +141,13 @@ class SlicingGraphBased(slicer_factory.SlicingHandlerGenerator):
     
     Note: only work for graph object from the igraph package.
     '''
-    def plotGraph(self, graph, node_to_token_dic, figFilePath):
+    def plotGraph(self, graph, nodesCommMembership, node_to_token_dic, figFilePath):            
+        edges = []
+        for edge in graph.es():
+            if nodesCommMembership[edge.tuple[0]] != nodesCommMembership[edge.tuple[1]]:
+                edges.append(edge)
+        graph.delete_edges(edges)
+        
         '''
         Creating gradient color scheme for the graph edges. Green edges
         have the minimum found weight and red edges the maximum.
@@ -175,7 +183,8 @@ class SlicingGraphBased(slicer_factory.SlicingHandlerGenerator):
         text.set_font_properties(font)
         
         degrees = graph.degree()
-        nodeLabels = [self.token_to_word[node_to_token_dic[nodeIndex]] + " (" + str(degree) + ")"  for nodeIndex, degree in enumerate(degrees)]
+        #nodeLabels = [self.token_to_word[node_to_token_dic[nodeIndex]] + " (" + str(degree) + ")"  for nodeIndex, degree in enumerate(degrees)]
+        nodeLabels = [self.token_to_word[node_to_token_dic[nodeIndex]]  for nodeIndex, degree in enumerate(degrees)]
         visual_style = {}
         
         
@@ -183,18 +192,37 @@ class SlicingGraphBased(slicer_factory.SlicingHandlerGenerator):
         digitized_degrees =  np.digitize(degrees, bins)
         graph.vs["color"] = [colors[x-1] for x in digitized_degrees]
         N = graph.vcount()
-        visual_style["layout"] = graph.layout_fruchterman_reingold(weights=graph.es["weight"], maxiter=1000, area=N**3, repulserad=N**3)
+        #visual_style["layout"] = graph.layout_fruchterman_reingold(weights=graph.es["weight"], maxiter=4000, area=N**3, repulserad=N**3)
+        visual_style["layout"] = graph.layout("kk")
         
         visual_style["vertex_label"] = nodeLabels
         visual_style["vertex_label_size"] = 12
-        visual_style["vertex_size"] = 3        
-        visual_style["vertex_color"] = ["blue" for i in range(len(nodeLabels))]
+        visual_style["vertex_size"] = 6
+        color_list = ['red',  'blue', 'cyan', 'purple', 'white', 'black']
+        vertex_color = [color_list[x] for x in nodesCommMembership]
+        visual_style["vertex_color"] = vertex_color
+        
+        color_count = {}
+        for vertex in vertex_color:
+            if not vertex in color_count:
+                color_count[vertex] = 0
+            color_count[vertex] += 1
+        index = 0
+        for color in color_count:
+            tempIndex = color_count[color]
+            color_count[color] = index
+            index += tempIndex
+        vertexOrder = []
+        for vertex in vertex_color:
+            vertexOrder.append(color_count[vertex])
+            color_count[vertex] += 1
+        #visual_style["vertex_order"] = vertexOrder
+        
         visual_style["vertex_label_dist"] = 1
         visual_style["edge_color"] = edgeColors
         plot(graph, figFilePath, margin = 40, **visual_style)
         img = mpimg.imread(figFilePath)
-        axplot = fig.add_axes([0.05, 0.15, 1, 0.8])
+        axplot = fig.add_axes([0.01, 0.15, 1, 0.8])
         axplot.axis('off')
         axplot.imshow(img)
         fig.savefig(figFilePath)
-        print ""

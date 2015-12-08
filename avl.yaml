@@ -9,7 +9,7 @@ input_generator:
     <<: *GLOBALS
     mode: on
     type: SegDocumentsGenerator
-    input_directory: resources/docsSeg
+    input_directory: resources/docsFullRelations
     
 input_preprocessing:
     <<: *GLOBALS
@@ -37,7 +37,7 @@ input_helper:
 slicing:
     <<: *GLOBALS
     mode: on
-    type: slicing_bigclam
+    type: slicing_community_fastgreedy
     weight_calculator: count_best_tfidf
     maxNodes: 50
     num_timeslices: 7
