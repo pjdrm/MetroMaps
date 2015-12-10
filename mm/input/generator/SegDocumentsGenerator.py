@@ -40,10 +40,15 @@ class SegDocumentsGenerator(object):
             with open (doc, "r") as docFile:
                 docStr += docFile.read()
             docStr = filter(lambda x: x in string.printable, docStr)
-            segments = re.compile("==========\n").split(docStr)
-            cleanSeg = segments[len(segments)-1].replace("==========", "")
-            segments[len(segments)-1] = cleanSeg
-            for j in range(1, len(segments)):
+            segments = re.compile("==========\n").split(docStr)[1:]
+            
+            if segments[-1] == '':
+                segments = segments[:-1]
+                
+            nSegs = len(segments)                
+            cleanSeg = segments[nSegs-1].replace("==========", "")
+            segments[nSegs-1] = cleanSeg
+            for j in range(0, nSegs):
                 with open(self.domain + "/data/rawtext/"+ str(i) + ".txt", "w") as text_file:
                     text_file.write(segments[j])
                 dicts.append({"timestamp": i, "id": i, "name": str(i) + ".txt"})
