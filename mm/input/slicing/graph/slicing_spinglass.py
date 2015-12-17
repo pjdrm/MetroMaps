@@ -27,6 +27,21 @@ class SlicingSpinglass(slicing_graph_based.SlicingGraphBased):
         self.wc_des = slicer_configs['weight_calculator']
         
     def spinglass(self):
+        '''
+        For some reason the spinglass algorithm does not work is the graph
+        has disconnected component. This code just keep largest connected graph
+        
+        TODO: see why I actually have disconnected components
+        '''
+        clusters = self.g.clusters()
+        subGraphs = clusters.subgraphs()
+        maxNodes = 0
+        mainGraph = None
+        for gr in subGraphs:
+            if gr.vcount() >= maxNodes:
+                maxNodes = gr.vcount()
+                mainGraph = gr
+        self.g = mainGraph
         vertexCluster =  self.g.community_spinglass(weights="weight")
         return self.igraphWrapper.getCommunities(vertexCluster)
     
