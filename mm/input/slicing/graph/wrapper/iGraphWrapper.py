@@ -120,7 +120,6 @@ class iGraphWrapper(object):
         node_membership = vertexCluster.membership
         communities_list = [{'cluster_tokens' : [], 'k' : 5} for i in range(max(node_membership)+1)]
         for node_index, com_index in enumerate(node_membership):
-            print node_index
             communities_list[com_index]['cluster_tokens'].append(self.graph_slicer.token_to_word[self.node_to_token_dic[node_index]])
             
         comms_filtered = self.filterCommunities(communities_list, 2)

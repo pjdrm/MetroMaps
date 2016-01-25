@@ -26,6 +26,8 @@ class SlicingEdgeBetweeness(slicing_graph_based.SlicingGraphBased):
         self.weightcalc = factory(slicer_configs, self.igraphWrapper)
         self.weightcalc.calculateWeights()
         self.wc_des = slicer_configs['weight_calculator']
+        self.debugDir = 'resources/slicing_results/edge_betweeness/'
+        self.debugFile = self.debugDir + self.wc_des + ".txt"
         
     def edge_betweenness(self):
         vertexCluster = self.g.community_edge_betweenness(weights="weight").as_clustering()
@@ -33,10 +35,9 @@ class SlicingEdgeBetweeness(slicing_graph_based.SlicingGraphBased):
     
     def run(self):
         communities = self.edge_betweenness()
-        directory = 'slicing_results/edge_betweenness/'
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-        #self.print_communities(communities, directory + self.wc_des + ".txt")
+        if not os.path.exists(self.debugDir):
+            os.makedirs(self.debugDir)
+        self.print_communities(communities, self.debugFile)
         return communities
     
 def construct(config):

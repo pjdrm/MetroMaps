@@ -26,6 +26,8 @@ class SlicingLouvain(slicing_graph_based.SlicingGraphBased):
         self.weightcalc = factory(slicer_configs, self.igraphWrapper)
         self.weightcalc.calculateWeights()
         self.wc_des = slicer_configs['weight_calculator']
+        self.debugDir = 'resources/slicing_results/louvain/'
+        self.debugFile = self.debugDir + self.wc_des + ".txt"
         
     def louvain(self):
         vertexCluster = louvain.find_partition(self.g, method='Modularity', weight='weight');
@@ -33,10 +35,9 @@ class SlicingLouvain(slicing_graph_based.SlicingGraphBased):
     
     def run(self):
         communities = self.louvain()
-        directory = 'slicing_results/louvain/'
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-        self.print_communities(communities, directory + self.wc_des + ".txt")
+        if not os.path.exists(self.debugDir):
+            os.makedirs(self.debugDir)
+        self.print_communities(communities, self.debugFile + self.wc_des + ".txt")
         return communities
     
 def construct(config):

@@ -40,7 +40,7 @@ class SegDocumentsGenerator(object):
             with open (doc, "r") as docFile:
                 docStr += docFile.read()
             docStr = filter(lambda x: x in string.printable, docStr)
-            segments = re.compile("==========\n").split(docStr)[1:]
+            segments = re.compile("==========\r?\n").split(docStr)[1:]
             
             if segments[-1] == '':
                 segments = segments[:-1]

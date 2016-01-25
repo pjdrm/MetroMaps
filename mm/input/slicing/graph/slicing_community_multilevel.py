@@ -26,6 +26,8 @@ class SlicingCommunityMultilevel(slicing_graph_based.SlicingGraphBased):
         self.weightcalc = factory(slicer_configs, self.igraphWrapper)
         self.weightcalc.calculateWeights()
         self.wc_des = slicer_configs['weight_calculator']
+        self.debugDir = 'resources/slicing_results/multilevel/'
+        self.debugFile = self.debugDir + self.wc_des + ".txt"
         
     def community_multilevel(self):
         vertexCluster = self.g.community_multilevel(weights="weight")
@@ -33,10 +35,9 @@ class SlicingCommunityMultilevel(slicing_graph_based.SlicingGraphBased):
     
     def run(self):
         communities = self.community_multilevel()
-        directory = 'slicing_results/multilevel/'
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-        self.print_communities(communities, directory + self.wc_des + ".txt")
+        if not os.path.exists(self.debugDir):
+            os.makedirs(self.debugDir)
+        self.print_communities(communities, self.debugFile)
         return communities
     
 def construct(config):

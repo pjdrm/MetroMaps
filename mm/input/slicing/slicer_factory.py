@@ -64,6 +64,18 @@ class SlicingHandlerGenerator(object):
         date = str(cluster_number) + '_' + str(doc_number) + '_' + str(self.dateIndex)
         self.dateIndex
         return date
+    
+    def print_communities(self, communities, outFilePath):
+        str = ''
+        for community in communities:
+            for word in community['cluster_tokens']:
+                str += word + ', '
+            str = str[:-2]
+            str += '\n\n'
+        str = str[:-2]   
+        print str
+        with open(outFilePath, 'w') as file:
+            file.write(str)
 
     def write_docs_in_cluster(self, docs_in_cluster, ostream, cluster_index):
         doc_ids_in_cluster = [str(doc.get('id')) for doc in docs_in_cluster]

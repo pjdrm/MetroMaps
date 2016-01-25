@@ -7,7 +7,6 @@ To use this algorithm, in the .yaml configuration write the name of this module.
 
 @author: Mota
 '''
-import numpy as np
 from sklearn.cluster import AffinityPropagation
 import mm.input.slicing.clustering.slicing_cluster_based as slicing_cluster_based
 

@@ -20,6 +20,7 @@ import matplotlib.image as mpimg
 import numpy as np
 import os
 from random import randint
+from gensim.models.word2vec import score_cbow_pair
 
 class SlicingGraphBased(slicer_factory.SlicingHandlerGenerator):
     def __init__(self, slicer_configs):
@@ -90,19 +91,23 @@ class SlicingGraphBased(slicer_factory.SlicingHandlerGenerator):
     '''
     Implements a method for assigning documents to a particular community.
     Each document has a score regarding a community and is assigned
-    to the one with the hieghst score.
+    to the one with the highest score.
     '''          
     def mapSegsComm(self, communities, id_to_token, doc_counts):
         mapping = [ [] for com in communities]
+        f = open(self.debugFile,'w')
         for doc_id in sorted(doc_counts.keys(), key=lambda x: int(x)):
             bestScore = 0.0
             bestComm = 0
+            f.write(doc_id+"\n")
             for commIndex, comm in enumerate(communities):
                 score = self.commScore(comm, doc_counts[doc_id], id_to_token)
+                f.write(str(commIndex) + ": " + str(score)+"\n")
                 if score >= bestScore:
                     bestScore = score
                     bestComm = commIndex
             mapping[bestComm].append({"timestamp" : int(doc_id), "id" : int(doc_id), "name" : doc_id + ".txt"})
+        f.close()
         return mapping
     
     '''
@@ -122,18 +127,6 @@ class SlicingGraphBased(slicer_factory.SlicingHandlerGenerator):
                 score += 1
         normalized_score = score / len(comm["cluster_tokens"])
         return normalized_score
-    
-    def print_communities(self, communities, outFilePath):
-        str = ''
-        for community in communities:
-            for word in community['cluster_tokens']:
-                str += word + ', '
-            str = str[:-2]
-            str += '\n\n'
-        str = str[:-2]   
-        print str
-        with open(outFilePath, 'w') as file:
-            file.write(str)
         
     '''
     Function that plots a word co-occurrence graph.

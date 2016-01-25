@@ -6,6 +6,7 @@ To use this algorithm, in the .yaml configuration write the name of this module.
 (slicing: type: slicing_clique_precolation)
 @author: Mota
 '''
+import os
 import snap
 import mm.input.slicing.graph.slicing_graph_based as slicing_graph_based
 
@@ -13,6 +14,8 @@ class SlicingCP(slicing_graph_based.SlicingGraphBased):
     def __init__(self, slicer_configs):
         super(SlicingCP, self).__init__(slicer_configs)
         self.g = self.createGraph()
+        self.debugDir = 'resources/slicing_results/cliqueprecolation/'
+        self.debugFile = self.debugDir + self.wc_des + ".txt"
     
     def best_clique_precolation(self):
         maxComm = 0
@@ -44,7 +47,11 @@ class SlicingCP(slicing_graph_based.SlicingGraphBased):
         return community_list
     
     def run(self):
-        return self.clique_percolation()
+        communities = self.clique_percolation()
+        if not os.path.exists(self.debugDir):
+            os.makedirs(self.debugDir)
+        self.print_communities(communities, self.debugFile)
+        return communities
         
     
 def construct(config):

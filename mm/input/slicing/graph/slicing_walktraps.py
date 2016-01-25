@@ -25,6 +25,8 @@ class SlicingWalktraps(slicing_graph_based.SlicingGraphBased):
         self.weightcalc = factory(slicer_configs, self.igraphWrapper)
         self.weightcalc.calculateWeights()
         self.wc_des = slicer_configs['weight_calculator']
+        self.debugDir = 'resources/slicing_results/fastgreedy/'
+        self.debugFile = self.debugDir + self.wc_des + ".txt"
         
     def walktraps(self, steps):
         vertexCluster =  self.g.community_walktrap(weights="weight", steps=steps).as_clustering()
@@ -39,10 +41,9 @@ class SlicingWalktraps(slicing_graph_based.SlicingGraphBased):
                 maxSize = lenComm
                 bestComm = communities
             
-        directory = 'slicing_results/walktraps/'
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-        self.print_communities(bestComm, directory + self.wc_des + ".txt")
+        if not os.path.exists(self.debugDir):
+            os.makedirs(self.debugDir)
+        self.print_communities(communities, self.debugFile)
         return communities
     
 def construct(config):
