@@ -15,7 +15,7 @@ class SlicingCP(slicing_graph_based.SlicingGraphBased):
         super(SlicingCP, self).__init__(slicer_configs)
         self.g = self.createGraph()
         self.debugDir = 'resources/slicing_results/cliqueprecolation/'
-        self.debugFile = self.debugDir + self.wc_des + ".txt"
+        self.debugFile = self.debugDir + "clique_precolation.txt"
     
     def best_clique_precolation(self):
         maxComm = 0

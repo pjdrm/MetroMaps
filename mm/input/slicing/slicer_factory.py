@@ -72,10 +72,9 @@ class SlicingHandlerGenerator(object):
                 str += word + ', '
             str = str[:-2]
             str += '\n\n'
-        str = str[:-2]   
-        print str
+        str = str[:-2]
         with open(outFilePath, 'w') as file:
-            file.write(str)
+            file.write(str+"\n")
 
     def write_docs_in_cluster(self, docs_in_cluster, ostream, cluster_index):
         doc_ids_in_cluster = [str(doc.get('id')) for doc in docs_in_cluster]

@@ -95,7 +95,7 @@ class SlicingGraphBased(slicer_factory.SlicingHandlerGenerator):
     '''          
     def mapSegsComm(self, communities, id_to_token, doc_counts):
         mapping = [ [] for com in communities]
-        f = open(self.debugFile,'w')
+        f = open(self.debugFile,'a')
         for doc_id in sorted(doc_counts.keys(), key=lambda x: int(x)):
             bestScore = 0.0
             bestComm = 0

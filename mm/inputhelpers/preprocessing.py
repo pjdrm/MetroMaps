@@ -67,6 +67,7 @@ class TextPreprocessing(object):
         
     def run(self):
         for doc in glob.glob(self.raw_text + "/*"):
+            doc = doc.replace("\\", "/")
             doc_name = doc.split('/')[-1]
             with open (doc, "r+") as docFile, open(self.input_preprocessing_configs['domain'] + '/data/swtext/' + doc_name, "w") as docWithSW:
                 docStr = docFile.read()

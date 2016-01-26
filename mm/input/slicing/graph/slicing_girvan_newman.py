@@ -16,7 +16,7 @@ class SlicingGirvanNewman(slicing_graph_based.SlicingGraphBased):
         super(SlicingGirvanNewman, self).__init__(slicer_configs)
         self.g = self.createGraph()
         self.debugDir = 'resources/slicing_results/girvan_newman/'
-        self.debugFile = self.debugDir + self.wc_des + ".txt"
+        self.debugFile = self.debugDir + "girvan_newman.txt"
     
     def girvan_newman(self):
         CmtyV = snap.TCnComV()

@@ -17,7 +17,7 @@ class SlicingBigClam(slicing_graph_based.SlicingGraphBased):
             super(SlicingBigClam, self).__init__(slicer_configs)
             self.g = self.createGraph()
             self.debugDir = 'resources/slicing_results/bigclam/'
-            self.debugFile = self.debugDir + self.wc_des + ".txt"
+            self.debugFile = self.debugDir + "bigclam.txt"
     
     '''
     The actual Bigclam code is in an executable in the resources/bigclam directory. This
