@@ -10,6 +10,7 @@ import mmrun
 from sklearn import metrics
 import json
 import operator
+import tests.eval_metrics as eval_metrics
 
 def sliceTester(configs, test_configs):
     slicing_true_labels = [int(x) for x in test_configs['slicing_true_labels'].split(',')]
@@ -20,6 +21,7 @@ def sliceTester(configs, test_configs):
     mmrun.Run_input_preprocessing(configs)
     mmrun.Run_input_handler(configs)
     results_rand_index = {}
+    results_f1 = {}
     results_slice_labels = {}
     if "slicing_igraph" in test_configs:
         for  graph_alg in test_configs["slicing_igraph"]["algorithms"]:
@@ -36,10 +38,11 @@ def sliceTester(configs, test_configs):
                         index = el['timestamp'] - 1
                         slicing_labels[index] = label
                     label += 1
-                        
-                rand_index = metrics.adjusted_rand_score(slicing_true_labels, slicing_labels)
-                results_rand_index[graph_alg + " " + weight_scheme] = rand_index
-                results_slice_labels[graph_alg + " " + weight_scheme] = ', '.join(str(e) for e in slicing_labels)
+                
+                alg = graph_alg + " " + weight_scheme
+                results_rand_index[alg] = metrics.adjusted_rand_score(slicing_true_labels, slicing_labels)
+                results_f1[alg] = eval_metrics.f_measure(slicing_true_labels, slicing_labels)
+                results_slice_labels[alg] = ', '.join(str(e) for e in slicing_labels)
       
     if "slicing_other" in test_configs:       
         for  cluster_alg in test_configs["slicing_other"]["algorithms"]:
@@ -63,7 +66,7 @@ def sliceTester(configs, test_configs):
     sorted_results = sorted(results_rand_index.items(), key=operator.itemgetter(1), reverse=True)
     strREsults = ""
     for result in sorted_results:
-        strREsults += result[0] + "\t" + str(result[1]) + '\t[' + results_slice_labels[result[0]] +  ']\n'
+        strREsults += result[0] + " Rand Index: " + str(result[1]) + " F1: " + str(results_f1[result[0]]) + '\t[' + results_slice_labels[result[0]] +  ']\n'
     with open("resources/tests/results.txt","w") as results_file:    
         results_file.write(strREsults)
     print "Finished tests"

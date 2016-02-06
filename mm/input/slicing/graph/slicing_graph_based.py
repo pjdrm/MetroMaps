@@ -19,6 +19,7 @@ import matplotlib as mpl
 import matplotlib.image as mpimg
 import numpy as np
 import os
+import score.score_function_factory as sff
 from random import randint
 from gensim.models.word2vec import score_cbow_pair
 
@@ -29,6 +30,7 @@ class SlicingGraphBased(slicer_factory.SlicingHandlerGenerator):
         self.token_to_word = {v: k for k, v in self.data["global_tokens"].items()}
         self.k = 5
         self.max_tokens = int(slicer_configs['maxNodes'])
+        self.doc_com_score = sff.scoreFuncFactory(slicer_configs)
     
     '''
     Creates a co-occurrence graph from the set of documents. The graph is
@@ -44,7 +46,8 @@ class SlicingGraphBased(slicer_factory.SlicingHandlerGenerator):
             token_ids = []
             token_tfidf = {}
             for token_id in self.doc_counts[doc_id]:
-                if self.doc_counts[doc_id][token_id] < self.min_freq_in_doc:
+                #if self.doc_counts[doc_id][token_id] < self.min_freq_in_doc:
+                if self.num_docs_with_term.get(token_id, 1) < self.min_freq_in_doc:
                     continue
                 token_tfidf[token_id] = self.tfidf(token_id, doc_id)
             token_ids = sorted(token_tfidf, key=lambda x : -token_tfidf[x])[:self.max_tokens]
@@ -101,8 +104,8 @@ class SlicingGraphBased(slicer_factory.SlicingHandlerGenerator):
             bestComm = 0
             f.write(doc_id+"\n")
             for commIndex, comm in enumerate(communities):
-                score = self.commScore(comm, doc_counts[doc_id], id_to_token)
-                f.write(str(commIndex) + ": " + str(score)+"\n")
+                score, contributingWords = self.commScore(comm, doc_id)
+                f.write(str(commIndex) + ": " + str(score) + " words: " + contributingWords + "\n")
                 if score >= bestScore:
                     bestScore = score
                     bestComm = commIndex
@@ -112,21 +115,10 @@ class SlicingGraphBased(slicer_factory.SlicingHandlerGenerator):
     
     '''
     Score function between a document and a community.
-    It is based on the number of tokens that are common to
-    the document and a community.
-    
-    The score is normalized by the number of elements in the community.
-    The idea is to prevent that communities with a high number of elements
-    automatically have a higher score.
+    The used function is defined in the yaml file (slicing/score_function)
     '''
-    def commScore(self, comm, doc_counts, id_to_token):
-        score = 0.0
-        for token_id in doc_counts:
-            token = id_to_token[int(token_id)]
-            if token in comm["cluster_tokens"]:
-                score += 1
-        normalized_score = score / len(comm["cluster_tokens"])
-        return normalized_score
+    def commScore(self, comm, doc_id):
+        return self.doc_com_score.score(comm, self, doc_id)
         
     '''
     Function that plots a word co-occurrence graph.
@@ -191,7 +183,7 @@ class SlicingGraphBased(slicer_factory.SlicingHandlerGenerator):
         visual_style["vertex_label"] = nodeLabels
         visual_style["vertex_label_size"] = 12
         visual_style["vertex_size"] = 6
-        color_list = ['red',  'blue', 'cyan', 'purple', 'white', 'black']
+        color_list = ['red',  'blue', 'cyan', 'purple', 'white', 'black', '#84D3FD', '#16597D', '#9F5EC5', '#4E1C6B', '#D76602', '#8E3B35', '#F0DE16', '#FF2841', '#ADFF2F', '#20B2AA', '#9370DB', '#FFDEAD', '#808000', '#AFEEEE', '#8B4513', '#87CEEB', '#EE82EE', '#FF6347', '#008080', '#FF7F50', '#DC143C']
         vertex_color = [color_list[x] for x in nodesCommMembership]
         visual_style["vertex_color"] = vertex_color
         

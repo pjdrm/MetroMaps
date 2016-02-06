@@ -5,8 +5,6 @@ based on clustering algorithms.
 Documents that are clustered together will be in the same
 "slice", from which word clusters will be extracted in the next step of the pipeline.
 
-
-
 @author: Mota
 '''
 from gensim.models.doc2vec import Doc2Vec, LabeledSentence

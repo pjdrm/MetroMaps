@@ -25,11 +25,12 @@ class SlicingWalktraps(slicing_graph_based.SlicingGraphBased):
         self.weightcalc = factory(slicer_configs, self.igraphWrapper)
         self.weightcalc.calculateWeights()
         self.wc_des = slicer_configs['weight_calculator']
-        self.debugDir = 'resources/slicing_results/fastgreedy/'
+        self.debugDir = 'resources/slicing_results/walktraps/'
         self.debugFile = self.debugDir + self.wc_des + ".txt"
         
     def walktraps(self, steps):
         vertexCluster =  self.g.community_walktrap(weights="weight", steps=steps).as_clustering()
+        self.plotGraph(self.g, vertexCluster.membership, self.igraphWrapper.node_to_token_dic, "graph_plots/co-occurrence_"+self.wc_des+".png")
         return self.igraphWrapper.getCommunities(vertexCluster)
     
     def run(self):
