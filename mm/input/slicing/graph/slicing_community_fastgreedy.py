@@ -31,8 +31,7 @@ class SlicingFastGreedy(slicing_graph_based.SlicingGraphBased):
         
     def fast_greedy(self):
         vertexCluster = self.g.community_fastgreedy(weights="weight").as_clustering()
-        self.plotGraph(self.g, vertexCluster.membership, self.igraphWrapper.node_to_token_dic, "graph_plots/co-occurrence_"+self.wc_des+".png")
-        #self.plotGraph2(self.g, "graph_plots/co-occurrence_"+self.wc_des+".png", vertexCluster.membership)
+        #self.plotGraph(self.g, vertexCluster.membership, self.igraphWrapper.node_to_token_dic, "graph_plots/co-occurrence_"+self.wc_des+".png")
         return self.igraphWrapper.getCommunities(vertexCluster)
     
     def run(self):

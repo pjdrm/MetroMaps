@@ -10,7 +10,7 @@ import mmrun
 from sklearn import metrics
 import json
 import operator
-import tests.eval_metrics as eval_metrics
+import eval_metrics
 
 def sliceTester(configs, test_configs):
     slicing_true_labels = [int(x) for x in test_configs['slicing_true_labels'].split(',')]
@@ -57,9 +57,10 @@ def sliceTester(configs, test_configs):
                     index = el['timestamp'] - 1
                     slicing_labels[index] = label
                 label += 1
-                        
+                       
             rand_index = metrics.adjusted_rand_score(slicing_true_labels, slicing_labels)
             results_rand_index[cluster_alg] = rand_index
+            results_f1[cluster_alg] = eval_metrics.f_measure(slicing_true_labels, slicing_labels)
             results_slice_labels[cluster_alg] = ', '.join(str(e) for e in slicing_labels)
             
             

@@ -185,7 +185,8 @@ def isClusterAlg(module_name):
         "slicing_mean_shift" : True,
         "slicing_affinity_propagation" : True,
         "slicing_dbscan" : True,
-        "slicing_agglomerative_clustering" : True
+        "slicing_agglomerative_clustering" : True,
+        "slicing_nmf" : True
     }
     return graph_algs.get(module_name, False)
 

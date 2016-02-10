@@ -13,7 +13,7 @@ from sklearn.cluster import MeanShift
 class SlicingMeanShift(slicing_cluster_based.SlicingClusterBased):
     def __init__(self, slicer_configs):
         super(SlicingMeanShift, self).__init__(slicer_configs)
-        self.bandwidth = 14
+        self.bandwidth = slicer_configs["clustering"]["bandwidth"]
         #self.bandwidth = estimate_bandwidth(elements, quantile=0.3, n_samples=None)
         
     def mean_shift(self, samples):
