@@ -26,7 +26,7 @@ class CommonWordsTFIDF(object):
         totalPossibleScore = 0.0
         for token_id in doc_counts:
             token = id_to_token[int(token_id)]
-            tfidfScore = self.tfidf(token_id, doc_id)
+            tfidfScore = graph.tfidf(token_id, doc_id)
             totalPossibleScore += tfidfScore
             if token in comm["cluster_tokens"]:
                 score += tfidfScore 

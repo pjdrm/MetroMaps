@@ -12,3 +12,12 @@ domains/lotr/out
 /louvain_slicing.txt
 /whitelist_avl_clean_stems.txt
 /whitelist_avl_clean.txt
+/docs/
+/notes/
+/resources/
+/avl_common_topics.yaml
+/avl.yaml
+/lotr_blacklist.yaml
+/lotr.yaml
+/requirements.txt
+/sample.yaml

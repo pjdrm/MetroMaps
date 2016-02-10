@@ -4,7 +4,7 @@ Created on 01/02/2016
 @author: Mota
 '''
 
-class CommonWords(object):
+class CommonWordsComm(object):
            
     def score(self, comm, graph, docId):
         return self.commonWordsScore(comm, graph, docId)    
@@ -32,4 +32,4 @@ class CommonWords(object):
         return (normalized_score, contributingWords[:-2])
     
 def construct():
-    return CommonWords()
+    return CommonWordsComm()
