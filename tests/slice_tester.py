@@ -11,8 +11,10 @@ from sklearn import metrics
 import json
 import operator
 import eval_metrics
+#from tests import eval_metrics
 
 def sliceTester(configs, test_configs):
+    
     slicing_true_labels = [int(x) for x in test_configs['slicing_true_labels'].split(',')]
     
     
