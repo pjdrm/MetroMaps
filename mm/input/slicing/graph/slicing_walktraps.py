@@ -30,7 +30,7 @@ class SlicingWalktraps(slicing_graph_based.SlicingGraphBased):
         
     def walktraps(self, steps):
         vertexCluster =  self.g.community_walktrap(weights="weight", steps=steps).as_clustering()
-        self.plotGraph(self.g, vertexCluster.membership, self.igraphWrapper.node_to_token_dic, "graph_plots/co-occurrence_"+self.wc_des+".png")
+        #self.plotGraph(self.g, vertexCluster.membership, self.igraphWrapper.node_to_token_dic, "graph_plots/co-occurrence_"+self.wc_des+".png")
         return self.igraphWrapper.getCommunities(vertexCluster)
     
     def run(self):

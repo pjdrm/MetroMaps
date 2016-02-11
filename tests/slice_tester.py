@@ -18,7 +18,6 @@ def sliceTester(configs, test_configs):
     
     slicing_true_labels = [int(x) for x in test_configs['slicing_true_labels'].split(',')]
     
-    
     mmrun.Run_init()
     mmrun.Run_input_generator(configs)
     mmrun.Run_input_preprocessing(configs)
@@ -29,9 +28,10 @@ def sliceTester(configs, test_configs):
     results_nmi = {}
     results_purity = {}
     results_slice_labels = {}
+    slicing_configs = configs.get('slicing')
+    slicing_configs["true_labels"] = slicing_true_labels
     if "slicing_igraph" in test_configs:
         for  graph_alg in test_configs["slicing_igraph"]["algorithms"]:
-            slicing_configs = configs.get('slicing')
             slicing_configs["type"] = graph_alg
             for score_f in test_configs["score_function"]:
                 slicing_configs["graph_community"]["score_function"] = score_f
@@ -57,7 +57,6 @@ def sliceTester(configs, test_configs):
       
     if "slicing_other" in test_configs:       
         for  cluster_alg in test_configs["slicing_other"]["algorithms"]:
-            slicing_configs = configs.get('slicing')
             slicing_configs["type"] = cluster_alg
             score_funcs = [""]
             if isGraphAlg(cluster_alg):

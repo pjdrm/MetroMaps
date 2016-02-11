@@ -21,6 +21,7 @@ class SlicingClusterBased(slicer_factory.SlicingHandlerGenerator):
         self.pos_doc_dic = {}
         self.cluster_elms = self.createElements()
         self.num_clusters = slicer_configs["clustering"]["k"]
+        self.true_labels = slicer_configs["true_labels"]
         #elements = self.createElemntsDoc2Vec()
         #self.token_pos_dic, self.vocab_size, self. n_docs = self.getTokenPosDic()
         
@@ -45,10 +46,10 @@ class SlicingClusterBased(slicer_factory.SlicingHandlerGenerator):
         elements = np.zeros(shape=(self.num_docs, self.vocab_size))
         i = 0
         for doc_id in self.doc_keys:
-            self.pos_doc_dic[i] = doc_id
+            self.pos_doc_dic[int(doc_id) - 1] = int(doc_id)
             for token_id, count in self.doc_counts[doc_id].iteritems():
                 tfidf_score = self.tfidf(token_id, doc_id)
-                elements[i][int(token_id)-1] = tfidf_score
+                elements[int(doc_id)-1][int(token_id)-1] = tfidf_score
             i += 1
         return elements
     
