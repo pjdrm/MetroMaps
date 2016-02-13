@@ -12,10 +12,10 @@ import json
 import operator
 import eval_metrics
 from  mm.input.slicing.slicer_factory import isGraphAlg
+import scipy
 #from tests import eval_metrics
 
 def sliceTester(configs, test_configs):
-    
     slicing_true_labels = [int(x) for x in test_configs['slicing_true_labels'].split(',')]
     
     mmrun.Run_init()

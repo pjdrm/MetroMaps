@@ -175,7 +175,8 @@ def isGraphAlg(module_name):
         "slicing_label_propagation" : True,
         "slicing_community_multilevel" : True,
         "slicing_spinglass" : True,
-        "slicing_walktraps" : True
+        "slicing_walktraps" : True,
+        "slicing_lda" : True
     }
     return graph_algs.get(module_name, False)
 
