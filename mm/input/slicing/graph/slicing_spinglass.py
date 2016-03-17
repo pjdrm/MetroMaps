@@ -24,7 +24,7 @@ class SlicingSpinglass(slicing_graph_based.SlicingGraphBased):
         self.g = self.igraphWrapper.createGraph()
         self.weightcalc = factory(slicer_configs, self.igraphWrapper)
         self.weightcalc.calculateWeights()
-        self.wc_des = slicer_configs["graph_community"]['weight_calculator']
+        self.wc_des = slicer_configs['weight_calculator']slicer_configs["graph_community"]['weight_calculator']
         self.debugDir = 'resources/slicing_results/spinglass/'
         self.debugFile = self.debugDir + self.wc_des + ".txt"
         

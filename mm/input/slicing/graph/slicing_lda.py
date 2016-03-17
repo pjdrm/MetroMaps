@@ -23,10 +23,11 @@ class SlicingLDA(slicing_graph_based.SlicingGraphBased):
         self.nTopics = slicer_configs["clustering"]["k"]
         self.corpus = self.createSparseElements()
         self.id2Word = self.token_to_word
+        self.wordsPerTopic = slicer_configs["wordsPerTopic"]
         
     def lda(self):
-        lda = ldamodel.LdaModel(corpus=self.corpus, id2word=self.id2Word, num_topics=self.nTopics, update_every=1, chunksize=8, passes=1000)
-        topicWordsList = lda.print_topics(self.nTopics, 20)
+        lda = ldamodel.LdaModel(corpus=self.corpus, id2word=self.id2Word, num_topics=self.nTopics, update_every=1, chunksize=11, passes=10)
+        topicWordsList = lda.print_topics(self.nTopics, self.wordsPerTopic)
         wordComm = []
         for topicWords in topicWordsList:
             words = topicWords.split(" + ")

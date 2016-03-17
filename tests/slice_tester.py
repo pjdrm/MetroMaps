@@ -10,34 +10,58 @@ import mmrun
 from sklearn import metrics
 import json
 import operator
-import eval_metrics
 from  mm.input.slicing.slicer_factory import isGraphAlg
-import scipy
-#from tests import eval_metrics
+import eval_metrics
 
 def sliceTester(configs, test_configs):
     slicing_true_labels = [int(x) for x in test_configs['slicing_true_labels'].split(',')]
-    
-    mmrun.Run_init()
-    mmrun.Run_input_generator(configs)
-    mmrun.Run_input_preprocessing(configs)
-    mmrun.Run_input_handler(configs)
     results_rand_index = {}
     results_f1 = {}
     results_acc = {}
-    results_nmi = {}
-    results_purity = {}
     results_slice_labels = {}
-    slicing_configs = configs.get('slicing')
-    slicing_configs["true_labels"] = slicing_true_labels
-    if "slicing_igraph" in test_configs:
-        for  graph_alg in test_configs["slicing_igraph"]["algorithms"]:
-            slicing_configs["type"] = graph_alg
-            for score_f in test_configs["score_function"]:
-                slicing_configs["graph_community"]["score_function"] = score_f
-                for weight_scheme in test_configs["slicing_igraph"]["weight_schemes"]:
-                    slicing_configs["graph_community"]["weight_calculator"] = weight_scheme
-                    print "Testing %s" % graph_alg + " " + weight_scheme
+    for n in [1]:
+        configs.get('input_preprocessing')["n"] = 15
+        mmrun.Run_init()
+        mmrun.Run_input_generator(configs)
+        mmrun.Run_input_preprocessing(configs)
+        mmrun.Run_input_handler(configs)
+        slicing_configs = configs.get('slicing')
+        slicing_configs["true_labels"] = slicing_true_labels
+        slicing_configs["steps"] = 19
+        if "slicing_igraph" in test_configs:
+            for  graph_alg in test_configs["slicing_igraph"]["algorithms"]:
+                slicing_configs["type"] = graph_alg
+                for score_f in test_configs["score_function"]:
+                    slicing_configs["graph_community"]["score_function"] = score_f
+                    for weight_scheme in test_configs["slicing_igraph"]["weight_schemes"]:
+                        slicing_configs["graph_community"]["weight_calculator"] = weight_scheme
+                        print "Testing %s" % graph_alg + " " + weight_scheme  + " " + str(n)
+                        slicing_clusters = mmrun.Run_slicing_handler(configs)
+                        slicing_labels = [None]*len(slicing_true_labels)
+                        label = 0
+                        for slice_cluster in slicing_clusters:
+                            for el in slice_cluster:
+                                index = el['timestamp'] - 1
+                                slicing_labels[index] = label
+                            label += 1
+                        
+                        alg = graph_alg + " " + weight_scheme +  " " + score_f  + " top-N " + str(n)       
+                        rand_index = metrics.adjusted_rand_score(slicing_true_labels, slicing_labels)
+                        results_rand_index[alg] = rand_index
+                        results_f1[alg] = eval_metrics.f_measure(slicing_true_labels, slicing_labels)
+                        results_acc[alg] = eval_metrics.accuracy(slicing_true_labels, slicing_labels)
+                        results_slice_labels[alg] = ', '.join(str(e) for e in slicing_labels)
+          
+        if "slicing_other" in test_configs:       
+            for cluster_alg in test_configs["slicing_other"]["algorithms"]:
+                score_funcs = [""]
+                if isGraphAlg(cluster_alg):
+                    score_funcs = test_configs["score_function"]
+                for score_f in score_funcs:
+                    slicing_configs["graph_community"]["score_function"] = score_f
+                    slicing_configs = configs.get('slicing')
+                    slicing_configs["type"] = cluster_alg
+                    print "Testing %s" % cluster_alg 
                     slicing_clusters = mmrun.Run_slicing_handler(configs)
                     slicing_labels = [None]*len(slicing_true_labels)
                     label = 0
@@ -46,47 +70,19 @@ def sliceTester(configs, test_configs):
                             index = el['timestamp'] - 1
                             slicing_labels[index] = label
                         label += 1
-                    
-                    alg = graph_alg + " " + weight_scheme + " " + score_f
-                    results_rand_index[alg] = metrics.adjusted_rand_score(slicing_true_labels, slicing_labels)
+                
+                    alg = cluster_alg + " " + score_f  + " top-N " + str(n)    
+                    rand_index = metrics.adjusted_rand_score(slicing_true_labels, slicing_labels)
+                    results_rand_index[alg] = rand_index
                     results_f1[alg] = eval_metrics.f_measure(slicing_true_labels, slicing_labels)
                     results_acc[alg] = eval_metrics.accuracy(slicing_true_labels, slicing_labels)
-                    results_nmi[alg] = eval_metrics.normalized_mutual_info_score(slicing_true_labels, slicing_labels)
-                    results_purity[alg] = eval_metrics.purity(slicing_true_labels, slicing_labels)
                     results_slice_labels[alg] = ', '.join(str(e) for e in slicing_labels)
-      
-    if "slicing_other" in test_configs:       
-        for  cluster_alg in test_configs["slicing_other"]["algorithms"]:
-            slicing_configs["type"] = cluster_alg
-            score_funcs = [""]
-            if isGraphAlg(cluster_alg):
-                score_funcs = test_configs["score_function"]
-            for score_f in score_funcs:
-                slicing_configs["graph_community"]["score_function"] = score_f
-                print "Testing %s" % cluster_alg
-                slicing_clusters = mmrun.Run_slicing_handler(configs)
-                slicing_labels = [None]*len(slicing_true_labels)
-                label = 0
-                for slice_cluster in slicing_clusters:
-                    for el in slice_cluster:
-                        index = el['timestamp'] - 1
-                        slicing_labels[index] = label
-                    label += 1
-                
-                alg = cluster_alg + " " + score_f     
-                rand_index = metrics.adjusted_rand_score(slicing_true_labels, slicing_labels)
-                results_rand_index[alg] = rand_index
-                results_f1[alg] = eval_metrics.f_measure(slicing_true_labels, slicing_labels)
-                results_acc[alg] = eval_metrics.accuracy(slicing_true_labels, slicing_labels)
-                results_nmi[alg] = eval_metrics.normalized_mutual_info_score(slicing_true_labels, slicing_labels)
-                results_purity[alg] = eval_metrics.purity(slicing_true_labels, slicing_labels)
-                results_slice_labels[alg] = ', '.join(str(e) for e in slicing_labels)
             
             
     sorted_results = sorted(results_rand_index.items(), key=operator.itemgetter(1), reverse=True)
     strREsults = ""
     for result in sorted_results:
-        strREsults += result[0] + " Rand Index: " + str(result[1]) + " F1: " + str(results_f1[result[0]]) + " Acc: " + str(results_acc[result[0]]) + " NMI: " + str(results_nmi[result[0]]) + " Purity: " + str(results_purity[result[0]]) + '\t[' + results_slice_labels[result[0]] +  ']\n'
+        strREsults += result[0] + " " + " Rand Index: " + str(result[1]) + " F1: " + str(results_f1[result[0]]) + " Acc: " + str(results_acc[result[0]]) + '\t[' + results_slice_labels[result[0]] +  ']\n'
     with open("resources/tests/results.txt","w") as results_file:    
         results_file.write(strREsults)
     print "Finished tests"

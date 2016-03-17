@@ -41,24 +41,22 @@ class iGraphWrapper(object):
     to generate the appropriate type of graph.
     '''
     def createGraph(self):
+        
         token_ids_list = []
-        strDebug = "=======\n"
         for doc_id in self.graph_slicer.doc_keys:
             token_ids = []
             token_tfidf = {}
             for token_id in self.graph_slicer.doc_counts[doc_id]:
-                #if self.graph_slicer.doc_counts[doc_id][token_id] < self.graph_slicer.min_freq_in_doc:
-                if self.graph_slicer.num_docs_with_term.get(token_id, 1) < self.graph_slicer.min_freq_in_doc:
-                    #print self.graph_slicer.token_to_word[int(token_id)]
+                if self.graph_slicer.doc_counts[doc_id][token_id] < self.graph_slicer.min_freq_in_doc:
                     continue
                 
                 tfidf_score = self.graph_slicer.tfidf(token_id, doc_id)
-                strDebug += self.graph_slicer.token_to_word[int(token_id)] + ": " + str(tfidf_score) + "\n"
                 token_tfidf[token_id] = tfidf_score    
                       
                 if not int(token_id) in self.token_tfidfscores:
                     self.token_tfidfscores[int(token_id)] = []
                 self.token_tfidfscores[int(token_id)].append(tfidf_score)
+                
                 
             token_ids = sorted(token_tfidf, key=lambda x : -token_tfidf[x])[:self.graph_slicer.max_tokens]
             
@@ -66,8 +64,7 @@ class iGraphWrapper(object):
             if len_token_ids == 0 or len_token_ids == 1:
                 continue
             token_ids_list.append(token_ids)
-        #with open("tfidfDebug.txt", "w") as fileTfidf:
-        #    fileTfidf.write(strDebug)   
+            
         n_nodes = len(set(chain(*token_ids_list)))
         g = ig.Graph(n_nodes)
         nodeIndex = 0
@@ -126,5 +123,7 @@ class iGraphWrapper(object):
             communities_list[com_index]['cluster_tokens'].append(self.graph_slicer.token_to_word[self.node_to_token_dic[node_index]])
             
         comms_filtered = self.filterCommunities(communities_list, 2)
+        if len(comms_filtered) == 0:
+            comms_filtered = communities_list
         return comms_filtered
         

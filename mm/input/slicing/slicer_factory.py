@@ -38,9 +38,9 @@ class SlicingHandlerGenerator(object):
             return token_max, num_docs_with_term
         
     def tfidf(self, token_id, doc_id):
-        #if self.num_docs_with_term.get(token_id, 1) <= 1:
-        #    '''do check so we do not divide by 0'''
-        #    return 0
+        if self.num_docs_with_term.get(token_id, 1) <= 1:
+            '''do check so we do not divide by 0'''
+            return 0
         in_doc_count = self.doc_counts.get(str(doc_id),{}).get(token_id,0)
         tf = math.log(float(in_doc_count + 1.0))  #0.5 + 0.5 * in_doc_count / float(max_count)
         idf = math.log(float(self.num_docs)/float(self.num_docs_with_term[str(token_id)]))
@@ -175,8 +175,7 @@ def isGraphAlg(module_name):
         "slicing_label_propagation" : True,
         "slicing_community_multilevel" : True,
         "slicing_spinglass" : True,
-        "slicing_walktraps" : True,
-        "slicing_lda" : True
+        "slicing_walktraps" : True
     }
     return graph_algs.get(module_name, False)
 

@@ -30,7 +30,7 @@ class SlicingLouvain(slicing_graph_based.SlicingGraphBased):
         self.debugFile = self.debugDir + self.wc_des + ".txt"
         
     def louvain(self):
-        vertexCluster = louvain.find_partition(self.g, method='Modularity', weight='weight');
+        vertexCluster = louvain.find_partition(self.g, method='Modularity', weight='weight', initial_membership=range(self.g.vcount()));
         return self.igraphWrapper.getCommunities(vertexCluster)
     
     def run(self):

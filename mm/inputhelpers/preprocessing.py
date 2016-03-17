@@ -10,7 +10,6 @@ import glob
 import utils.nlp.tokenizer as tokenizer
 import utils.nlp.tfidf as tfidf
 import utils.nlp.stopwords as stopwords
-import itertools
 
 class TextPreprocessing(object):
     '''
@@ -56,34 +55,6 @@ class TextPreprocessing(object):
             return self.contractions_dic[match.group(0)]
         
         return contractions_re.sub(replace, docStr)
-    
-    def getVocab(self):
-        tokenizedDocs = []
-        for doc in glob.glob(self.raw_text + "/*"):
-            doc = doc.replace("\\", "/")
-            doc_name = doc.split('/')[-1]
-            with open (doc, "r+") as docFile:
-                docStr = docFile.read()
-            tokenizedDocs.append(tokenizer.tokenize(docStr))
-        vocab = set(list(itertools.chain(*tokenizedDocs)))
-        return vocab, tokenizedDocs
-    
-    def dashNormalization(self, docStr, tokenizedDoc, vocab):
-        for word in tokenizedDoc:
-            if "-" in word:
-                if word == "in-order":
-                    print ""
-                wordSplit = word.split("-")
-                if '' in wordSplit:
-                    continue 
-                if "".join(wordSplit) in vocab:
-                    docStr = docStr.replace(word, "".join(wordSplit))
-                    continue
-                for w in wordSplit:
-                    if w in vocab:
-                        docStr = docStr.replace(word, ' '.join(wordSplit))
-                        break
-        return docStr
                 
     '''
     Generated the list of words that can appear on a metro station (whitelist)
@@ -95,19 +66,13 @@ class TextPreprocessing(object):
                 file.write("{}\n".format(keyword))
         
     def run(self):
-        if(self.input_preprocessing_configs['dash_normalization']):
-            vocab, tokenizedDocs = self.getVocab()
-            
-        i = 0
         for doc in glob.glob(self.raw_text + "/*"):
             doc = doc.replace("\\", "/")
             doc_name = doc.split('/')[-1]
             with open (doc, "r+") as docFile, open(self.input_preprocessing_configs['domain'] + '/data/swtext/' + doc_name, "w") as docWithSW:
                 docStr = docFile.read()
                 docStr = filter(lambda x: x in string.printable, docStr)
-                if(self.input_preprocessing_configs['dash_normalization']):
-                    docStr = self.dashNormalization(docStr, tokenizedDocs[i], vocab)
-                    i += 1
+                
                 if(self.input_preprocessing_configs['expand_contractions']):
                     docStr = self.expand(docStr)
             

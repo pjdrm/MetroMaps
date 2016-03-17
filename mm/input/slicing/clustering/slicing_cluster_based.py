@@ -11,6 +11,7 @@ from gensim.models.doc2vec import Doc2Vec, LabeledSentence
 from mm.input.slicing import slicer_factory
 import numpy as np
 import glob
+from random import shuffle
 
 class SlicingClusterBased(slicer_factory.SlicingHandlerGenerator):
     def __init__(self, slicer_configs):
@@ -20,9 +21,9 @@ class SlicingClusterBased(slicer_factory.SlicingHandlerGenerator):
         self.vocab_size = len(self.global_counts.keys())
         self.pos_doc_dic = {}
         self.cluster_elms = self.createElements()
+        #self.cluster_elms = self.createElemntsDoc2Vec()
         self.num_clusters = slicer_configs["clustering"]["k"]
         self.true_labels = slicer_configs["true_labels"]
-        #elements = self.createElemntsDoc2Vec()
         #self.token_pos_dic, self.vocab_size, self. n_docs = self.getTokenPosDic()
         
     def slice(self):
@@ -76,19 +77,31 @@ class SlicingClusterBased(slicer_factory.SlicingHandlerGenerator):
     Computes the Doc2Vec features representation of the
     documents (extension of the Google's word2Vec algorithm).
     '''
-    def createElemntsDoc2Vec(self):
-        model = Doc2Vec(alpha=0.025, min_alpha=0.025)  # use fixed learning rate
+    def createElemntsDoc2Vec(self, alpha = 871, alphaDec = 1.5):
+        
+        #model_dm = Doc2Vec(min_count=1, window=15, alpha=alpha, min_alpha=0.025, sample=1e-3, negative=5, workers=3)  # use fixed learning rate
+        model_dbow = Doc2Vec(dm=0, min_count=1, window=15, alpha=0.0025, min_alpha=0.025, sample=1e-3, negative=5, workers=3)  # use fixed learning rate
         #segments = [s for s in LabeledLineSentence("domains/avl/data/rawtext")]
-        segments = self.gen_labled_sent("domains/avl/data/rawtext")
-        model.build_vocab(segments)
+        segments = self.gen_labled_sent("domains/SSSS/data/rawtext")
+        #model_dm.build_vocab(segments)
+        model_dbow.build_vocab(segments)
         for epoch in range(10):
-            print "epoch: %d" % epoch
-            model.train(segments)
-            model.alpha -= 0.002  # decrease the learning rate
-            model.min_alpha = model.alpha  # fix the learning rate, no decay
-        print model.docvecs.__dict__.keys()
-        elements = [model.docvecs[key] for key in  model.docvecs.__dict__['doctags'].keys()]
-        return elements
+            print "doc2Vec training epoch %d" % epoch
+            shuffle(segments)
+            '''
+            model_dm.train(segments)
+            model_dm.alpha -= alphaDec  # decrease the learning rate
+            model_dm.min_alpha = model_dm.alpha  # fix the learning rate, no decay
+            '''
+            
+            model_dbow.train(segments)
+            model_dbow.alpha -= alphaDec  # decrease the learning rate
+            model_dbow.min_alpha = model_dbow.alpha  # fix the learning rate, no decay
+            
+        #elements_dm = [model_dm.docvecs[key] for key in  model_dm.docvecs.__dict__['doctags'].keys()]
+        elements_dbow = [model_dbow.docvecs[key] for key in  model_dbow.docvecs.__dict__['doctags'].keys()]
+        #elements = np.hstack((elements_dm, elements_dbow))
+        return np.array(elements_dbow)
     
     def getDoc(self, pos):
         doc_id = int(self.pos_doc_dic[pos])
