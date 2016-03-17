@@ -28,6 +28,7 @@ class SlicingEdgeBetweeness(slicing_graph_based.SlicingGraphBased):
         self.wc_des = slicer_configs["graph_community"]['weight_calculator']
         self.debugDir = 'resources/slicing_results/edge_betweeness/'
         self.debugFile = self.debugDir + self.wc_des + ".txt"
+        self.desc = "edge_betweeness" + " weight: " + self.wc_des + " " + self.desc
         
     def edge_betweenness(self):
         vertexCluster = self.g.community_edge_betweenness(weights="weight").as_clustering()

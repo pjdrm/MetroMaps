@@ -17,6 +17,7 @@ class SlicingGirvanNewman(slicing_graph_based.SlicingGraphBased):
         self.g = self.createGraph()
         self.debugDir = 'resources/slicing_results/girvan_newman/'
         self.debugFile = self.debugDir + "girvan_newman.txt"
+        self.desc = "girvan_newman " + self.desc
     
     def girvan_newman(self):
         CmtyV = snap.TCnComV()

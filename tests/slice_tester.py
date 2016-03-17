@@ -11,8 +11,10 @@ from sklearn import metrics
 import json
 import operator
 from  mm.input.slicing.slicer_factory import isGraphAlg
+from  mm.input.slicing.slicer_factory import factory as slicer_factory
 import eval_metrics
 
+'''
 def sliceTester(configs, test_configs):
     slicing_true_labels = [int(x) for x in test_configs['slicing_true_labels'].split(',')]
     results_rand_index = {}
@@ -86,6 +88,101 @@ def sliceTester(configs, test_configs):
     with open("resources/tests/results.txt","w") as results_file:    
         results_file.write(strREsults)
     print "Finished tests"
+'''
+    
+def sliceTester(configsYaml, test_configs):
+    resultsDic = {}
+    resultsDic["ari"] = {}
+    resultsDic["f1"] = {}
+    resultsDic["acc"] = {}
+    true_clusters = [int(x) for x in test_configs['slicing_true_labels'].split(',')]
+    for alg in test_configs["algorithms"]:
+        if test_configs["algorithms"][alg]["run"] == "False":
+            continue
+        if isGraphAlg(alg):
+            testsGraph(alg, configsYaml, test_configs, true_clusters, resultsDic)
+            
+    sorted_results = sorted(resultsDic["ari"].items(), key=operator.itemgetter(1), reverse=True)
+    strREsults = ""
+    for result in sorted_results:
+        strREsults += (result[0] + " " + " ARI: " + str(result[1]) + 
+                                         " F1: " + str(resultsDic["f1"][result[0]]) + 
+                                         " Acc: " + str(resultsDic["acc"][result[0]]) + 
+                                         '\t[' + resultsDic[result[0]] +  ']\n')
+                                        
+    with open("resources/tests/results.txt","w") as results_file:    
+        results_file.write(strREsults)
+    print "Finished tests"
+            
+def runTest(configsYaml, true_clusters, resultsDic, nRuns = 1):
+    slicer = slicer_factory(configsYaml["slicing"])
+    print "Testing %s" % slicer.desc
+    totalARI = 0.0
+    totalF1 = 0.0
+    totalAcc = 0.0
+    for i in range(nRuns):
+        slicing_clusters = slicer.slice()
+        hyp_clusters = toArrayClusters(slicing_clusters)
+        resultsHandler(slicer.desc, hyp_clusters, true_clusters, resultsDic)
+        totalARI += resultsDic["ari"][slicer.desc]
+        totalF1 += resultsDic["f1"][slicer.desc]
+        totalAcc += resultsDic["acc"][slicer.desc]
+    resultsDic["ari"][slicer.desc] = totalARI / float(nRuns)
+    resultsDic["f1"][slicer.desc] = totalF1 / float(nRuns)
+    resultsDic["acc"][slicer.desc] = totalAcc / float(nRuns)
+            
+def testsGraph(alg, configsYaml, test_configs, true_clusters, resultsDic):
+    configsYaml.get('slicing')["type"] = alg
+    n_vals = eval(test_configs["algorithms"][alg]["n"])
+    for n in n_vals:
+        configsYaml["input_preprocessing"]["n"] = n
+        configsYaml["slicing"]["n"] = n
+        mmrun.Run_init()
+        mmrun.Run_input_generator(configsYaml)
+        mmrun.Run_input_preprocessing(configsYaml)
+        mmrun.Run_input_handler(configsYaml)
+        for scoreFunc in test_configs["algorithms"][alg]["score_function"]:
+            configsYaml.get('slicing')["graph_community"]["score_function"] = scoreFunc
+            if "weight_schemes" in  test_configs["algorithms"][alg]:
+                testWeightedGraph(alg, configsYaml, test_configs, true_clusters, resultsDic)
+            elif alg == "slicing_lda":
+                testLDA(alg, configsYaml, test_configs, true_clusters, resultsDic)
+            else:
+                runTest(configsYaml, true_clusters, resultsDic)
+            
+def testWeightedGraph(alg, configsYaml, test_configs, true_clusters, resultsDic):
+    for weight_scheme in test_configs["algorithms"][alg]["weight_schemes"]:
+        configsYaml["slicing"]["graph_community"]["weight_calculator"] = weight_scheme
+        if alg == "slicing_walktraps":
+            testWalktraps(alg, configsYaml, test_configs, true_clusters, resultsDic)
+        else:
+            runTest(configsYaml, true_clusters, resultsDic)
+            
+def testLDA(alg, configsYaml, test_configs, true_clusters, resultsDic):
+    for wordsPerTopic in eval(test_configs["algorithms"][alg]["wordsPerTopic"]):
+        configsYaml["slicing"]["graph_community"]["wordsPerTopic"] = wordsPerTopic
+        runTest(configsYaml, true_clusters, resultsDic, test_configs["algorithms"][alg]["nRuns"])
+                
+def testWalktraps(alg, configsYaml, test_configs, true_clusters, resultsDic):
+    for steps in eval(test_configs["algorithms"][alg]["steps"]):
+        configsYaml.get('slicing')["steps"] = steps
+        runTest(configsYaml, true_clusters, resultsDic)
+
+def toArrayClusters(slicing_clusters):
+    clustArray = [None]*sum([len(x) for x in slicing_clusters])
+    label = 0
+    for slice_cluster in slicing_clusters:
+        for el in slice_cluster:
+            index = el['timestamp'] - 1
+            clustArray[index] = label
+        label += 1
+    return clustArray
+                
+def resultsHandler(alg_desc, hyp_clusters, true_clusters, resultsDic):
+    resultsDic["ari"][alg_desc] = metrics.adjusted_rand_score(true_clusters, hyp_clusters)
+    resultsDic["f1"][alg_desc] = eval_metrics.f_measure(true_clusters, hyp_clusters)
+    resultsDic["acc"][alg_desc] = eval_metrics.accuracy(true_clusters, hyp_clusters)
+    resultsDic[alg_desc] = ', '.join(str(e) for e in hyp_clusters)
 
 def main(config_file, test_configs, defaults="mm/default.yaml"):
     config_dict = {}

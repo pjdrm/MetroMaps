@@ -23,7 +23,8 @@ class SlicingLDA(slicing_graph_based.SlicingGraphBased):
         self.nTopics = slicer_configs["clustering"]["k"]
         self.corpus = self.createSparseElements()
         self.id2Word = self.token_to_word
-        self.wordsPerTopic = slicer_configs["wordsPerTopic"]
+        self.wordsPerTopic = slicer_configs["graph_community"]["wordsPerTopic"]
+        self.desc = "LDA wordsPerTopic: " + str(self.wordsPerTopic) + " " + self.desc
         
     def lda(self):
         lda = ldamodel.LdaModel(corpus=self.corpus, id2word=self.id2Word, num_topics=self.nTopics, update_every=1, chunksize=11, passes=10)

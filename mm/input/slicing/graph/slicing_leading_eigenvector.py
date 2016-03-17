@@ -27,6 +27,7 @@ class SlicingLeadingEigenvector(slicing_graph_based.SlicingGraphBased):
         self.wc_des = slicer_configs["graph_community"]['weight_calculator']
         self.debugDir = 'resources/slicing_results/leading_eigenvector/'
         self.debugFile = self.debugDir + self.wc_des + ".txt"
+        self.desc = "leading_eigenvector" + " weight: " + self.wc_des + " " + self.desc
         
     def leading_eigenvector(self):
         vertexCluster =  self.g.community_leading_eigenvector(weights="weight")

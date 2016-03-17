@@ -59,6 +59,7 @@ def Run_input_handler(configs):
 
 def Run_slicing_handler(configs):
     legacy_configs = configs.get('slicing')
+    legacy_configs["n"] = configs.get('input_preprocessing')["n"]
     if (legacy_configs.get('mode')):
         logging.info("Converting to legacy format")
         slicing_handler = mm.input.slicing.slicer_factory.factory(legacy_configs)

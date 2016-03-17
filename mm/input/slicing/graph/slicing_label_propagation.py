@@ -27,6 +27,7 @@ class SlicingLabelPropagation(slicing_graph_based.SlicingGraphBased):
         self.wc_des = slicer_configs["graph_community"]['weight_calculator']
         self.debugDir = 'resources/slicing_results/label_propagation/'
         self.debugFile = self.debugDir + self.wc_des + ".txt"
+        self.desc = "label_propagation" + " weight: " + self.wc_des + " " + self.desc
         
         
     def label_propagation(self):

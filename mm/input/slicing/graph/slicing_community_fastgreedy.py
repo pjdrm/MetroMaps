@@ -28,6 +28,7 @@ class SlicingFastGreedy(slicing_graph_based.SlicingGraphBased):
         self.wc_des = slicer_configs["graph_community"]['weight_calculator']
         self.debugDir = 'resources/slicing_results/fastgreedy/'
         self.debugFile = self.debugDir + self.wc_des + ".txt"
+        self.desc = self.desc = "fast_greedy" + " weight: " + self.wc_des + " " + self.desc 
         
     def fast_greedy(self):
         vertexCluster = self.g.community_fastgreedy(weights="weight").as_clustering()

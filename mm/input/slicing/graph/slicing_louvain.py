@@ -28,6 +28,7 @@ class SlicingLouvain(slicing_graph_based.SlicingGraphBased):
         self.wc_des = slicer_configs["graph_community"]['weight_calculator']
         self.debugDir = 'resources/slicing_results/louvain/'
         self.debugFile = self.debugDir + self.wc_des + ".txt"
+        self.desc = "louvain" + " weight: " + self.wc_des + " " + self.desc
         
     def louvain(self):
         vertexCluster = louvain.find_partition(self.g, method='Modularity', weight='weight', initial_membership=range(self.g.vcount()));

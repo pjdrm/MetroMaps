@@ -31,6 +31,8 @@ class SlicingGraphBased(slicer_factory.SlicingHandlerGenerator):
         self.k = 5
         self.max_tokens = int(slicer_configs['maxNodes'])
         self.doc_com_score = sff.scoreFuncFactory(slicer_configs)
+        self.desc = ("score_func: " + slicer_configs["graph_community"]["score_function"] + 
+                     " top-N " + str(slicer_configs["n"]))
     
     '''
     Creates a co-occurrence graph from the set of documents. The graph is

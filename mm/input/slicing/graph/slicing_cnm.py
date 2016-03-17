@@ -17,6 +17,7 @@ class SlicingCNM(slicing_graph_based.SlicingGraphBased):
         self.g = self.createGraph()
         self.debugDir = 'resources/slicing_results/cnm/'
         self.debugFile = self.debugDir + "cnm.txt"
+        self.desc = "cnm " + self.desc
         
     def cnm(self):
         CmtyV = snap.TCnComV()
