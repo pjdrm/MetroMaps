@@ -12,53 +12,32 @@ from sklearn.cluster import AgglomerativeClustering
 import mm.input.slicing.clustering.slicing_cluster_based as slicing_cluster_based
 from math import exp
 from sklearn import metrics
+import mm.input.slicing.clustering.utils.similairty_metrics as similairty_metrics
 
-var = 100
+#var = 100
 
 class SlicingAgglomerativeClustering(slicing_cluster_based.SlicingClusterBased):
     def __init__(self, slicer_configs):
         super(SlicingAgglomerativeClustering, self).__init__(slicer_configs)
         self.linkage = slicer_configs["clustering"]["linkage"]
-        ranges = slicer_configs["clustering"]["varRange"]
-        self.varRange = range(ranges[0], ranges[1])
+        self.metric = slicer_configs["clustering"]["metric"]
+        self.desc = "Agglomerative linkage: " + self.linkage + " metric: " + self.metric
+        if self.metric == "gaussian":
+            self.var = slicer_configs["clustering"]["var"]
+            self.desc += " var: " + str(self.var)
+            similairty_metrics.var = self.var
         
     def agglomerative_clustering(self, samples):
-        ac = AgglomerativeClustering(linkage = self.linkage, n_clusters=self.num_clusters, affinity = "cosine")
+        affinityArg = self.metric
+        if self.metric == "gaussian":
+            affinityArg = similairty_metrics.gaussianSimGraph
+            
+        ac = AgglomerativeClustering(linkage = self.linkage, n_clusters=self.num_clusters, affinity = affinityArg)
         ac.fit(samples)
         return ac.labels_
     
     def run(self):
-        '''
-        riBest = -1.0
-        labels = None
-        bestVar = 0.0
-        for variance in self.varRange:
-            global var
-            var = variance
-            try:
-                labels = self.agglomerative_clustering(self.cluster_elms)
-                ri = metrics.adjusted_rand_score(self.true_labels, labels)
-                if ri >= riBest:
-                    riBest = ri
-                    bestLabels = labels
-                    bestVar = var
-            except Exception: 
-                pass
-        print "Var %f" % bestVar
-        return bestLabels
-        '''
         return self.agglomerative_clustering(self.cluster_elms)
-        
-def gaussianSim(xi, xj):
-    return exp((-1 * np.linalg.norm(xi - xj) ** 2) / (2 * var))
-    
-def genSimGraph(cluster_elms):
-    sim_graph = np.zeros([cluster_elms.shape[0], cluster_elms.shape[0]])
-    for i, j in np.ndindex(sim_graph.shape):
-        sim = gaussianSim(cluster_elms[i], cluster_elms[j])
-        if sim >= 0:
-            sim_graph[i, j] = sim
-    return sim_graph
     
 def construct(config):
     return SlicingAgglomerativeClustering(config)

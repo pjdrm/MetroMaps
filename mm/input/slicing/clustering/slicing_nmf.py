@@ -20,6 +20,7 @@ class SlicingNMF(slicing_cluster_based.SlicingClusterBased):
     def __init__(self, slicer_configs):
         super(SlicingNMF, self).__init__(slicer_configs)
         self.cluster_elms = self.loadClusterElms(self.cluster_elms)
+        self.desc = "NMF"
         
     def loadClusterElms(self, clusterElem):
         return sp.csr_matrix(self.cluster_elms,dtype='float64') 

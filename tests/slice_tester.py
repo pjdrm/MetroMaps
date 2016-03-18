@@ -14,82 +14,6 @@ from  mm.input.slicing.slicer_factory import isGraphAlg
 from  mm.input.slicing.slicer_factory import factory as slicer_factory
 import eval_metrics
 
-'''
-def sliceTester(configs, test_configs):
-    slicing_true_labels = [int(x) for x in test_configs['slicing_true_labels'].split(',')]
-    results_rand_index = {}
-    results_f1 = {}
-    results_acc = {}
-    results_slice_labels = {}
-    for n in [1]:
-        configs.get('input_preprocessing')["n"] = 15
-        mmrun.Run_init()
-        mmrun.Run_input_generator(configs)
-        mmrun.Run_input_preprocessing(configs)
-        mmrun.Run_input_handler(configs)
-        slicing_configs = configs.get('slicing')
-        slicing_configs["true_labels"] = slicing_true_labels
-        slicing_configs["steps"] = 19
-        if "slicing_igraph" in test_configs:
-            for  graph_alg in test_configs["slicing_igraph"]["algorithms"]:
-                slicing_configs["type"] = graph_alg
-                for score_f in test_configs["score_function"]:
-                    slicing_configs["graph_community"]["score_function"] = score_f
-                    for weight_scheme in test_configs["slicing_igraph"]["weight_schemes"]:
-                        slicing_configs["graph_community"]["weight_calculator"] = weight_scheme
-                        print "Testing %s" % graph_alg + " " + weight_scheme  + " " + str(n)
-                        slicing_clusters = mmrun.Run_slicing_handler(configs)
-                        slicing_labels = [None]*len(slicing_true_labels)
-                        label = 0
-                        for slice_cluster in slicing_clusters:
-                            for el in slice_cluster:
-                                index = el['timestamp'] - 1
-                                slicing_labels[index] = label
-                            label += 1
-                        
-                        alg = graph_alg + " " + weight_scheme +  " " + score_f  + " top-N " + str(n)       
-                        rand_index = metrics.adjusted_rand_score(slicing_true_labels, slicing_labels)
-                        results_rand_index[alg] = rand_index
-                        results_f1[alg] = eval_metrics.f_measure(slicing_true_labels, slicing_labels)
-                        results_acc[alg] = eval_metrics.accuracy(slicing_true_labels, slicing_labels)
-                        results_slice_labels[alg] = ', '.join(str(e) for e in slicing_labels)
-          
-        if "slicing_other" in test_configs:       
-            for cluster_alg in test_configs["slicing_other"]["algorithms"]:
-                score_funcs = [""]
-                if isGraphAlg(cluster_alg):
-                    score_funcs = test_configs["score_function"]
-                for score_f in score_funcs:
-                    slicing_configs["graph_community"]["score_function"] = score_f
-                    slicing_configs = configs.get('slicing')
-                    slicing_configs["type"] = cluster_alg
-                    print "Testing %s" % cluster_alg 
-                    slicing_clusters = mmrun.Run_slicing_handler(configs)
-                    slicing_labels = [None]*len(slicing_true_labels)
-                    label = 0
-                    for slice_cluster in slicing_clusters:
-                        for el in slice_cluster:
-                            index = el['timestamp'] - 1
-                            slicing_labels[index] = label
-                        label += 1
-                
-                    alg = cluster_alg + " " + score_f  + " top-N " + str(n)    
-                    rand_index = metrics.adjusted_rand_score(slicing_true_labels, slicing_labels)
-                    results_rand_index[alg] = rand_index
-                    results_f1[alg] = eval_metrics.f_measure(slicing_true_labels, slicing_labels)
-                    results_acc[alg] = eval_metrics.accuracy(slicing_true_labels, slicing_labels)
-                    results_slice_labels[alg] = ', '.join(str(e) for e in slicing_labels)
-            
-            
-    sorted_results = sorted(results_rand_index.items(), key=operator.itemgetter(1), reverse=True)
-    strREsults = ""
-    for result in sorted_results:
-        strREsults += result[0] + " " + " Rand Index: " + str(result[1]) + " F1: " + str(results_f1[result[0]]) + " Acc: " + str(results_acc[result[0]]) + '\t[' + results_slice_labels[result[0]] +  ']\n'
-    with open("resources/tests/results.txt","w") as results_file:    
-        results_file.write(strREsults)
-    print "Finished tests"
-'''
-    
 def sliceTester(configsYaml, test_configs):
     resultsDic = {}
     resultsDic["ari"] = {}
@@ -97,10 +21,13 @@ def sliceTester(configsYaml, test_configs):
     resultsDic["acc"] = {}
     true_clusters = [int(x) for x in test_configs['slicing_true_labels'].split(',')]
     for alg in test_configs["algorithms"]:
+        configsYaml.get('slicing')["type"] = alg
         if test_configs["algorithms"][alg]["run"] == "False":
             continue
         if isGraphAlg(alg):
             testsGraph(alg, configsYaml, test_configs, true_clusters, resultsDic)
+        else:
+            testsCluster(alg, configsYaml, test_configs, true_clusters, resultsDic)
             
     sorted_results = sorted(resultsDic["ari"].items(), key=operator.itemgetter(1), reverse=True)
     strREsults = ""
@@ -130,9 +57,73 @@ def runTest(configsYaml, true_clusters, resultsDic, nRuns = 1):
     resultsDic["ari"][slicer.desc] = totalARI / float(nRuns)
     resultsDic["f1"][slicer.desc] = totalF1 / float(nRuns)
     resultsDic["acc"][slicer.desc] = totalAcc / float(nRuns)
+    
+def testsCluster(alg, configsYaml, test_configs, true_clusters, resultsDic):
+    if alg == "slicing_dbscan":
+        testDBScan(alg, configsYaml, test_configs, true_clusters, resultsDic)
+    elif alg == "slicing_affinity_propagation":
+        testAffinityProp(alg, configsYaml, test_configs, true_clusters, resultsDic)
+        
+    elif alg == "slicing_agglomerative_clustering":
+        testAgglomerative(alg, configsYaml, test_configs, true_clusters, resultsDic)
+    elif alg == "slicing_mean_shift":
+        testMeanShift(alg, configsYaml, test_configs, true_clusters, resultsDic)
+    elif alg == "slicing_spectral":
+        testSpectral(alg, configsYaml, test_configs, true_clusters, resultsDic)
+    else:
+        runTest(configsYaml, true_clusters, resultsDic)
+        
+def testDBScan(alg, configsYaml, test_configs, true_clusters, resultsDic):
+    for metric in test_configs["algorithms"][alg]["metric"]:
+        for eps in eval(test_configs["algorithms"][alg]["eps"]):
+            for minPts in eval(test_configs["algorithms"][alg]["minPts"]):
+                configsYaml["slicing"]["clustering"]["eps"] = eps
+                configsYaml["slicing"]["clustering"]["min_samples"] = minPts
+                configsYaml["slicing"]["clustering"]["metric"] = metric
+                if metric == "gaussian":
+                    for var in eval(test_configs["algorithms"][alg]["vars"]):
+                        configsYaml["slicing"]["clustering"]["var"] = var
+                        runTest(configsYaml, true_clusters, resultsDic)
+                else:
+                    runTest(configsYaml, true_clusters, resultsDic)
+                
+def testAffinityProp(alg, configsYaml, test_configs, true_clusters, resultsDic):
+    for damping in eval(test_configs["algorithms"][alg]["damping"]):
+        configsYaml["slicing"]["clustering"]["damping"] = damping
+        for preference in eval(test_configs["algorithms"][alg]["preference"]):
+            configsYaml["slicing"]["clustering"]["preference"] = preference
+            runTest(configsYaml, true_clusters, resultsDic)
+            
+def testAgglomerative(alg, configsYaml, test_configs, true_clusters, resultsDic):
+    for metric in test_configs["algorithms"][alg]["metric"]:
+        configsYaml["slicing"]["clustering"]["metric"] = metric
+        for linkage in test_configs["algorithms"][alg]["linkage"]:
+            if linkage == "ward":
+                configsYaml["slicing"]["clustering"]["metric"] = "euclidean"
+            configsYaml["slicing"]["clustering"]["linkage"] = linkage
+            if metric == "gaussian":
+                for var in eval(test_configs["algorithms"][alg]["vars"]):
+                    configsYaml["slicing"]["clustering"]["var"] = var
+                    runTest(configsYaml, true_clusters, resultsDic)
+            else:
+                runTest(configsYaml, true_clusters, resultsDic)
+                
+def testMeanShift(alg, configsYaml, test_configs, true_clusters, resultsDic):
+    for bandwidth in eval(test_configs["algorithms"][alg]["bandwidth"]):
+        configsYaml["slicing"]["clustering"]["bandwidth"] = bandwidth
+        runTest(configsYaml, true_clusters, resultsDic)
+        
+def testSpectral(alg, configsYaml, test_configs, true_clusters, resultsDic):
+    for metric in test_configs["algorithms"][alg]["metric"]:
+        configsYaml["slicing"]["clustering"]["metric"] = metric
+        if metric == "gaussian":
+            for var in eval(test_configs["algorithms"][alg]["vars"]):
+                configsYaml["slicing"]["clustering"]["var"] = var
+                runTest(configsYaml, true_clusters, resultsDic)
+        else:
+            runTest(configsYaml, true_clusters, resultsDic)
             
 def testsGraph(alg, configsYaml, test_configs, true_clusters, resultsDic):
-    configsYaml.get('slicing')["type"] = alg
     n_vals = eval(test_configs["algorithms"][alg]["n"])
     for n in n_vals:
         configsYaml["input_preprocessing"]["n"] = n

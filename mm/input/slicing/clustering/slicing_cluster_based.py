@@ -23,7 +23,7 @@ class SlicingClusterBased(slicer_factory.SlicingHandlerGenerator):
         self.cluster_elms = self.createElements()
         #self.cluster_elms = self.createElemntsDoc2Vec()
         self.num_clusters = slicer_configs["clustering"]["k"]
-        self.true_labels = slicer_configs["true_labels"]
+        #self.true_labels = slicer_configs["true_labels"]
         #self.token_pos_dic, self.vocab_size, self. n_docs = self.getTokenPosDic()
         
     def slice(self):

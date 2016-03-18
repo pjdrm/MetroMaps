@@ -15,6 +15,7 @@ class SlicingAffinityPropagation(slicing_cluster_based.SlicingClusterBased):
         super(SlicingAffinityPropagation, self).__init__(slicer_configs)
         self.damping = slicer_configs["clustering"]["damping"]
         self.preference = slicer_configs["clustering"]["preference"]
+        self.desc = "Affinity Propagation damping: " + str(self.damping) + " preference: " + str(self.preference)
         
     def affinity_propagation(self, samples):
         af = AffinityPropagation(damping = self.damping, preference = self.preference).fit(samples)

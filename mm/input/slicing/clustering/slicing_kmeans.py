@@ -14,6 +14,7 @@ import mm.input.slicing.clustering.slicing_cluster_based as slicing_cluster_base
 class SlicingKmeans(slicing_cluster_based.SlicingClusterBased):
     def __init__(self, slicer_configs):
         super(SlicingKmeans, self).__init__(slicer_configs)
+        self.desc = "kmeans"
         
     def kmeans(self, samples):
         km = KMeans(n_clusters=self.num_clusters)

@@ -15,6 +15,7 @@ class SlicingMeanShift(slicing_cluster_based.SlicingClusterBased):
     def __init__(self, slicer_configs):
         super(SlicingMeanShift, self).__init__(slicer_configs)
         self.bandwidth = slicer_configs["clustering"]["bandwidth"]
+        self.desc = "Mean Shift bandwidth: " + str(self.bandwidth)
         #self.bandwidth = estimate_bandwidth(elements, quantile=0.3, n_samples=None)
         
     def mean_shift(self, bandwidth, samples):
@@ -23,6 +24,7 @@ class SlicingMeanShift(slicing_cluster_based.SlicingClusterBased):
         return ms.labels_
     
     def run(self):
+        '''
         riBest = -1.0
         labels = None
         bandWidths = range(1, 1000)
@@ -41,6 +43,8 @@ class SlicingMeanShift(slicing_cluster_based.SlicingClusterBased):
         
         print "Bandwidth %f" % (bestBandwidth)  
         return bestLabels
+        '''
+        return self.mean_shift(self.bandwidth, self.cluster_elms)
 
 def construct(config):
     return SlicingMeanShift(config) 
