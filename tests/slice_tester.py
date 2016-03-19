@@ -13,8 +13,11 @@ import operator
 from  mm.input.slicing.slicer_factory import isGraphAlg
 from  mm.input.slicing.slicer_factory import factory as slicer_factory
 import eval_metrics
+import matplotlib.pyplot as plt
+from matplotlib.pyplot import legend, savefig
 
 def sliceTester(configsYaml, test_configs):
+    '''
     resultsDic = {}
     resultsDic["ari"] = {}
     resultsDic["f1"] = {}
@@ -35,10 +38,19 @@ def sliceTester(configsYaml, test_configs):
         strREsults += (result[0] + " " + " ARI: " + str(result[1]) + 
                                          " F1: " + str(resultsDic["f1"][result[0]]) + 
                                          " Acc: " + str(resultsDic["acc"][result[0]]) + 
-                                         '\t[' + resultsDic[result[0]] +  ']\n')
+                                         ' [' + resultsDic[result[0]] +  ']\n')
+    '''
                                         
-    with open("resources/tests/results.txt","w") as results_file:    
+    resultsFile = "resources/tests/results.txt"
+    
+    '''
+    with open(resultsFile,"w") as results_file:    
         results_file.write(strREsults)
+    '''
+    
+    if test_configs["plots"]["run"] == "True":
+        plotResult(test_configs["plots"]["xLabel"], eval(test_configs["plots"]["yLabels"]), resultsFile)
+        
     print "Finished tests"
             
 def runTest(configsYaml, true_clusters, resultsDic, nRuns = 1):
@@ -174,6 +186,43 @@ def resultsHandler(alg_desc, hyp_clusters, true_clusters, resultsDic):
     resultsDic["f1"][alg_desc] = eval_metrics.f_measure(true_clusters, hyp_clusters)
     resultsDic["acc"][alg_desc] = eval_metrics.accuracy(true_clusters, hyp_clusters)
     resultsDic[alg_desc] = ', '.join(str(e) for e in hyp_clusters)
+    
+def plotResult(xLabel, yLabels, resultsFilPath):
+    with open(resultsFilPath) as resultsFile:
+        results = resultsFile.readlines()
+    resultsDic = {}
+    for result in results:
+        x = getVals(result, [xLabel])[0]
+        ys = getVals(result, yLabels)
+        resultsDic[x] = ys
+        
+    sorted_results =sorted(resultsDic.items(), key=lambda t: t[0])
+    xVals = []
+    yVals_List = [[] for i in range(len(yLabels))]
+    for res in sorted_results:
+        xVals.append(res[0])
+        i = 0
+        for y in res[1]:
+            yVals_List[i].append(y)
+            i += 1
+    i = 0
+    plots = []
+    legends = []
+    for yVals in yVals_List:
+        pl, = plt.plot(xVals, yVals, linewidth=1.0)
+        plots.append(pl)
+        legends.append(yLabels[i])
+        i += 1
+    legend(plots, legends, loc='upper center', bbox_to_anchor=(0.5, -0.1), fancybox=True, shadow=True, ncol=len(yLabels))
+    plt.grid(True)
+    plt.xlabel(xLabel, fontsize=14)
+    savefig('resultsPlot.png', bbox_inches='tight')
+        
+def getVals(result, labels):
+    vals = []
+    for label in labels:
+        vals.append(float(result.split(label + ": ")[1].split(" ")[0].strip()))
+    return vals    
 
 def main(config_file, test_configs, defaults="mm/default.yaml"):
     config_dict = {}
