@@ -17,7 +17,6 @@ import matplotlib.pyplot as plt
 from matplotlib.pyplot import legend, savefig
 
 def sliceTester(configsYaml, test_configs):
-    '''
     resultsDic = {}
     resultsDic["ari"] = {}
     resultsDic["f1"] = {}
@@ -39,14 +38,11 @@ def sliceTester(configsYaml, test_configs):
                                          " F1: " + str(resultsDic["f1"][result[0]]) + 
                                          " Acc: " + str(resultsDic["acc"][result[0]]) + 
                                          ' [' + resultsDic[result[0]] +  ']\n')
-    '''
                                         
     resultsFile = "resources/tests/results.txt"
     
-    '''
     with open(resultsFile,"w") as results_file:    
         results_file.write(strREsults)
-    '''
     
     if test_configs["plots"]["run"] == "True":
         plotResult(test_configs["plots"]["xLabel"], eval(test_configs["plots"]["yLabels"]), resultsFile)

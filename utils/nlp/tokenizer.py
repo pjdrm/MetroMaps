@@ -8,11 +8,15 @@ import nltk
 from nltk.stem.porter import PorterStemmer
 
 stem_flag = False
+stemMap = {}
 
 def stem_tokens(tokens, stemmer):
     stemmed = []
     for item in tokens:
-        stemmed.append(stemmer.stem(item))
+        stem_item = stemmer.stem(item)
+        if not item in stemMap:
+            stemMap[item] = stem_item 
+        stemmed.append(stem_item)
     return stemmed
 
 def tokenize(text):
@@ -23,6 +27,13 @@ def tokenize(text):
         return stems
     else:
         return tokens
+    
+def writeStemMap(filePath):
+    smStr = ""
+    for word in stemMap:
+        smStr += word + " -> " + stemMap[word] + "\n"
+    with open(filePath, "w+") as smFile:
+        smFile.write(smStr)
 
 def stemTokens():
     global stem_flag

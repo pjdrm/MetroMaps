@@ -106,7 +106,7 @@ class SlicingGraphBased(slicer_factory.SlicingHandlerGenerator):
             f.write(doc_id+"\n")
             for commIndex, comm in enumerate(communities):
                 score, contributingWords = self.commScore(comm, doc_id)
-                f.write(str(commIndex) + ": " + str(score)+"\n")
+                f.write(str(commIndex) + ": " + str(score)+ " words: " + contributingWords + "\n")
                 if score >= bestScore:
                     bestScore = score
                     bestComm = commIndex
@@ -125,6 +125,25 @@ class SlicingGraphBased(slicer_factory.SlicingHandlerGenerator):
     '''
     def commScore(self, comm, doc_id):
         return self.doc_com_score.score(comm, self, doc_id)
+    
+    def graph2Txt(self, graph, node_to_token_dic, communities):
+        nodesTxt = "Id;Label;Community\n"
+        for node in graph.vs:
+            id = node.index
+            token = node_to_token_dic[id]
+            label = self.token_to_word[token]
+            comm = str(communities[id])
+            nodesTxt += str(id) + ";" + label + ";" + comm + "\n"
+        
+        with open("nodes.csv", "w+") as nodeFile:
+            nodeFile.write(nodesTxt[:-1])
+            
+        edgesTxt = "Source;Target;Type;Weight\n"
+        for edge in graph.es:
+            edgesTxt += str(edge.source) + ";" + str(edge.target) + ";Undirected;" + str(edge["weight"]) + "\n"
+            
+        with open("edges.csv", "w+") as nodeFile:
+            nodeFile.write(edgesTxt[:-1])
         
     '''
     Function that plots a word co-occurrence graph.

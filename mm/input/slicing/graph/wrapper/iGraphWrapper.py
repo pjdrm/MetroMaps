@@ -51,7 +51,7 @@ class iGraphWrapper(object):
                     continue
                 
                 tfidf_score = self.graph_slicer.tfidf(token_id, doc_id)
-                token_tfidf[token_id] = tfidf_score    
+                token_tfidf[token_id] = tfidf_score
                       
                 if not int(token_id) in self.token_tfidfscores:
                     self.token_tfidfscores[int(token_id)] = []

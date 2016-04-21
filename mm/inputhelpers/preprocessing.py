@@ -98,7 +98,10 @@ class TextPreprocessing(object):
                 docFile.seek(0)
                 docFile.write(docStr)
                 docFile.truncate()
-            
+          
+        #printing stem mapping
+        tokenizer.writeStemMap("stemMap.txt")
+           
         if(self.input_preprocessing_configs['gen_whitelist']):
             self.mkwhitelist(self.white_list)
         
