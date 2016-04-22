@@ -62,14 +62,8 @@ class SlicingGraphBased(slicer_factory.SlicingHandlerGenerator):
                 node_degrees[int(node_1)] = node_degrees.get(int(node_1), 0) + 1
                 node_degrees[int(node_2)] = node_degrees.get(int(node_2), 0) + 1
         
-        '''
-        counter = 0
-        #gLoaded = snap.LoadEdgeList(snap.PNGraph, "graph_file.txt", 0, 1)
-        for NI in g.Nodes():
-            print "node: %d, out-degree %d, in-degree %d" % ( NI.GetId(), NI.GetOutDeg(), NI.GetInDeg())
-            counter +=1
-        print "number of nodes: %d" % (counter)
-        '''
+        #logging tfidf word scores (the highest score is reported)
+        self.logTFIDFWordScores("resources\debug\tfidfScores.txt")
         return g
     
     def slice(self):
@@ -236,3 +230,22 @@ class SlicingGraphBased(slicer_factory.SlicingHandlerGenerator):
         axplot.axis('off')
         axplot.imshow(img)
         fig.savefig(figFilePath)
+        
+    def logTFIDFWordScores(self, filePath):
+        word_tfidfDic = {}
+        for doc_id in self.doc_keys:
+            for token_id in self.doc_counts[doc_id]:
+                tfidfSc = self.tfidf(token_id, doc_id)
+                if not token_id in word_tfidfDic:
+                    word_tfidfDic[token_id] = 0.0
+                if tfidfSc > word_tfidfDic[token_id]:           
+                    word_tfidfDic[token_id] = tfidfSc
+                
+        token_ids = sorted(word_tfidfDic, key=lambda x : -word_tfidfDic[x])
+        strTfidfSc = ""
+        for token in token_ids:
+            strTfidfSc += self.token_to_word[int(token)] + " " + str(word_tfidfDic[token]) + "\n"
+            
+        with open(filePath, "w+") as file:
+            file.write(strTfidfSc)    
+        

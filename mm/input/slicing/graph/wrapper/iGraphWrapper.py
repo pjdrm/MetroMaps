@@ -97,6 +97,7 @@ class iGraphWrapper(object):
                     edgeid = g.get_eid(intnode1, intnode2)
                     w = g.es[edgeid]['count']
                     g.es[edgeid]['count'] = w + 1.0     
+        self.graph_slicer.logTFIDFWordScores("./resources/debug/tfidfScores.txt")
         return g
     
     '''

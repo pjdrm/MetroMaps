@@ -100,7 +100,7 @@ class TextPreprocessing(object):
                 docFile.truncate()
           
         #printing stem mapping
-        tokenizer.writeStemMap("stemMap.txt")
+        tokenizer.writeStemMap("./resources/debug/stemMap.txt")
            
         if(self.input_preprocessing_configs['gen_whitelist']):
             self.mkwhitelist(self.white_list)
