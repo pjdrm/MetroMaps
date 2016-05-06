@@ -27,6 +27,25 @@ class iGraphWrapper(object):
     def addNodeIndex(self, tokenid, nodeIndex):
         self.token_to_node_dic[tokenid] = nodeIndex
         
+    def deleteNode(self, nodeId, graph):
+        nnodes = graph.vcount()
+        self.token_to_node_dic.pop(self.node_to_token_dic[nodeId], None)
+        graph.delete_vertices([nodeId])
+        nodes_to_shift = range(nodeId+1, nnodes)
+        for node in nodes_to_shift:
+            token = self.node_to_token_dic[node]
+            self.token_to_node_dic[token] = self.token_to_node_dic[token] - 1
+            self.node_to_token_dic[node-1] = token
+        self.node_to_token_dic.pop(nnodes-1, None)
+        
+    def deleteNodes(self, to_del_nodes, graph):
+        del_counter = 0
+        for node in to_del_nodes:
+            self.deleteNode(node - del_counter, graph)
+            del_counter += 1
+            
+        
+        
     def hasEdge(self, intnode1, intnode2, edgeList):
         for edge in edgeList:
             if (intnode1, intnode2) == edge:
@@ -41,7 +60,6 @@ class iGraphWrapper(object):
     to generate the appropriate type of graph.
     '''
     def createGraph(self):
-        
         token_ids_list = []
         for doc_id in self.graph_slicer.doc_keys:
             token_ids = []
@@ -127,4 +145,3 @@ class iGraphWrapper(object):
         if len(comms_filtered) == 0:
             comms_filtered = communities_list
         return comms_filtered
-        

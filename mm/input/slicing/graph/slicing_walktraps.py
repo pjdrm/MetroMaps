@@ -16,12 +16,14 @@ import mm.input.slicing.graph.slicing_graph_based as slicing_graph_based
 from mm.input.slicing.graph.weight.factory import factory
 from wrapper.iGraphWrapper import iGraphWrapper
 import os
+import prune.node_pruning as node_pruning
 
 class SlicingWalktraps(slicing_graph_based.SlicingGraphBased):
     def __init__(self, slicer_configs):
         super(SlicingWalktraps, self).__init__(slicer_configs)
         self.igraphWrapper = iGraphWrapper(self)
         self.g = self.igraphWrapper.createGraph()
+        node_pruning.normalDistPruning(self.g, 0.9, self.igraphWrapper)
         self.weightcalc = factory(slicer_configs, self.igraphWrapper)
         self.weightcalc.calculateWeights()
         self.wc_des = slicer_configs["graph_community"]['weight_calculator']

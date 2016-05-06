@@ -70,11 +70,7 @@ class WhiteListCounter():
 
         return {v: k for k,v in self.token_to_id.items()}
 
-    def save(self):
-        
-        
-
-       
+    def save(self):     
         together_out = self.mm_standard_input
         with open(together_out,'w') as out_file:
             d={}

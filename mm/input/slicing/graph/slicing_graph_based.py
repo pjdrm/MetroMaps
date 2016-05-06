@@ -134,7 +134,7 @@ class SlicingGraphBased(slicer_factory.SlicingHandlerGenerator):
             
         edgesTxt = "Source;Target;Type;Weight\n"
         for edge in graph.es:
-            edgesTxt += str(edge.source) + ";" + str(edge.target) + ";Undirected;" + str(edge["weight"]) + "\n"
+            edgesTxt += str(edge.source) + ";" + str(edge.target) + ";Undirected;" + str(round(edge["weight"],2)) + "\n"
             
         with open("edges.csv", "w+") as nodeFile:
             nodeFile.write(edgesTxt[:-1])
@@ -247,5 +247,4 @@ class SlicingGraphBased(slicer_factory.SlicingHandlerGenerator):
             strTfidfSc += self.token_to_word[int(token)] + " " + str(word_tfidfDic[token]) + "\n"
             
         with open(filePath, "w+") as file:
-            file.write(strTfidfSc)    
-        
+            file.write(strTfidfSc)
