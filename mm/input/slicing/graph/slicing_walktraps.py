@@ -23,14 +23,14 @@ class SlicingWalktraps(slicing_graph_based.SlicingGraphBased):
         super(SlicingWalktraps, self).__init__(slicer_configs)
         self.igraphWrapper = iGraphWrapper(self)
         self.g = self.igraphWrapper.createGraph()
-        node_pruning.normalDistPruning(self.g, 0.9, self.igraphWrapper)
+        pruneType = node_pruning.prune(slicer_configs["graph_prunning"], self.g, self.igraphWrapper)
         self.weightcalc = factory(slicer_configs, self.igraphWrapper)
         self.weightcalc.calculateWeights()
         self.wc_des = slicer_configs["graph_community"]['weight_calculator']
         self.debugDir = 'resources/slicing_results/walktraps/'
         self.debugFile = self.debugDir + self.wc_des + ".txt"
         self.steps = slicer_configs["steps"]
-        self.desc = "walktraps steps " + str(self.steps) + " weight: " + self.wc_des + " " + self.desc 
+        self.desc = "walktraps steps " + str(self.steps) + " weight: " + self.wc_des + " " + self.desc + " prunning " + pruneType
         
     def walktraps(self):
         vertexCluster =  self.g.community_walktrap(weights="weight", steps=self.steps).as_clustering()

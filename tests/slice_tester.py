@@ -162,10 +162,19 @@ def testLDA(alg, configsYaml, test_configs, true_clusters, resultsDic):
         configsYaml["slicing"]["graph_community"]["wordsPerTopic"] = wordsPerTopic
         runTest(configsYaml, true_clusters, resultsDic, test_configs["algorithms"][alg]["nRuns"])
                 
-def testWalktraps(alg, configsYaml, test_configs, true_clusters, resultsDic):
+def testWalktraps(alg, configsYaml, test_configs, true_clusters, resultsDic): 
     for steps in eval(test_configs["algorithms"][alg]["steps"]):
         configsYaml.get('slicing')["steps"] = steps
-        runTest(configsYaml, true_clusters, resultsDic)
+        if test_configs["graph_prunning"]["run"] == "True":
+            configsYaml.get('slicing')["graph_prunning"] = {}
+            for node_prune in test_configs["graph_prunning"]["node"]:
+                pruneType = node_prune.keys()[0]
+                for threshold in eval(node_prune[pruneType]):
+                    configsYaml.get('slicing')["graph_prunning"]["node"] = {pruneType : threshold}
+                    runTest(configsYaml, true_clusters, resultsDic)
+        else:
+            configsYaml.get('slicing')["graph_prunning"] = None
+            runTest(configsYaml, true_clusters, resultsDic)
 
 def toArrayClusters(slicing_clusters):
     clustArray = [None]*sum([len(x) for x in slicing_clusters])
