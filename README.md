@@ -11,9 +11,9 @@ python ./tests/slice_tester.py <config.yaml> <tests_config.json>
 
 - Configuration files examples can be found in AVL_trees_dataset_configs.zip, namely:
 
-<config.yaml> - avl.yaml
+  <config.yaml> - avl.yaml
 
-<tests_config.json> - avl_tests.json
+  <tests_config.json> - avl_tests.json
 
 - After running the program the output will be in the file ./resources/tests/results.txt
 
